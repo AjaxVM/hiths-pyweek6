@@ -1,4 +1,4 @@
-CLASSIC MODE:
+*CLASSIC MODE:*
 
 Map is a grid of square shaped tiles.
 Each territory is a group of tiles, kinda  like the hex tiles grouped together in dice wars.
@@ -44,7 +44,7 @@ We may even want to make it so that all units are bought, supply centers simply 
 The only problem with that is that it is less simple, and is kinda Battle for Wesnoth-y, IMO.
 
 
-ULTIMATE MODE:
+*ULTIMATE MODE:*
 This MODE may be to in-depth to make for Pyweek.
 
 This MODE is the same as CLASSIC MODE, except it adds more game-play and slows the game up to focus more on strategy.
@@ -73,7 +73,7 @@ With this mode we could change around the generals and battle plans to fit the t
 
 
 
-NON-SPECIFIC MODE stuff:
+*NON-SPECIFIC MODE stuff:*
 
 The game can start like dice wars, with everyone in random positions, with one palace each, or with an "already dominant player", where everyone starts out with their own little connected territories, except one player starts with 1/3 or 1/2 of the territories already under their control.
 The dominant player can also be a Rebel, so it will attack everyone roughly equally, and defend weaker players.
