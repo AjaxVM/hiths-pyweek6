@@ -12,8 +12,7 @@ Objects will be 3d renders at an isometric angle - regardless of tile-type.
 
 GUI will be the PygLibs GUI module - http://pymike93.googlepages.com/RoeBroesGUI.zip - current host only - moving to main pyglibs distro next release.
 
-We will probably be implementing networked play with a lobby, and maybe an ai.
-We might also just go with ai, depending on which is simpler, but I think the networking will be, due to the complexity of the game rules.
+Network play with a lobby + AI.
 
 ==Specifics==
 ===Units===
@@ -31,13 +30,11 @@ Special formations are cards generated at random times by your capitol that you 
 When a captain is killed there is a 33% chance that the victorious army - if it has captain - will learn some or all of the formation known by the defeated captain.
 
 ===Buildings===
-There are three kinds of buildings in the game.
+There are two kinds of buildings in the game.
 The palace/capitol is located on your starting territory, and will generate new troops, captains and formations for you. It also gives your troops extra defense against an enemy invasion.
 If you lose your capitol you do not get a new one, and the conqueror keeps your palace as a secondary one for themselves.
 
 Cities function like palaces - except they don't generate new formations or captains, and their troop production and defense bonus is decreased.
-
-Forts are a defense enhancing building that an army can build at a cost of no movement for 2 turns on a territory that has neither a city nor capitol. They give as much defense as a city.
 
 ===Battles===
 When a battle occurs in this game, both sides pick a formation to imploy.
@@ -73,3 +70,8 @@ Add me.
 
 ===Formation===
 This one is already implemented - I guess if we don't do formation we can cut captains and formations altogether - but we'll have to see.
+
+
+==Possible Additions==
+===Building===
+Forts are a defense enhancing building that an army can build at a cost of no movement for 2 turns on a territory that has neither a city nor capitol. They give as much defense as a city.
