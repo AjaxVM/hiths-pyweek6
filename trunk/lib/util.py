@@ -46,14 +46,7 @@ def get_random_adj(spot, dim, avoid=[]):
         return get_random_start(dim, avoid)
 
 def touching(x, y):
-    if x[0] == y[0]:
-        if x[1] - y[1] in [-1, 0, 1]:
-            return True
-    if x[0] - y[0] in [-1, 0, 1]:
-        if x[1] == y[1]:
-            return True
-    return False
-##    return (abs(x[0] - y[0]) <= 1 and abs(x[1] - y[1]) <= 1)
+    return (abs(x[0] - y[0]) <= 1 and abs(x[1] - y[1]) <= 1)
 
 def inmass(x, mass):
     for i in mass:
@@ -64,8 +57,6 @@ def inmass(x, mass):
 def get_landmass(grid):
     all = []
 
-    yp = 0
-    xp = 0
     for y in xrange(len(grid)):
         for x in xrange(len(grid[0])):
             pos = [x, y]
@@ -78,78 +69,7 @@ def get_landmass(grid):
                         break
                 if not im:
                     all.append([pos])
-            xp += 1
-        yp += 1
-        xp = 0
     return all
-
-##def get_dis(x, y):
-##    return abs(x[0] - y[0]) + abs(x[1] - y[1])
-##
-##def allowed_locs(x, avoid=[]):
-##    n = []
-##    for a in [-1, 0, 1]:
-##        for b in [-1, 0, 1]:
-##            a = x[0]+a
-##            b = x[1]+b
-##            if not [a, b] == x or\
-##               [a, b] in avoid:
-##                n.append([a, b])
-##    return n
-
-##def get_pos_between(x, y, randomness=5):
-##    total_rand = 0
-##    new = [x]
-##    while not new[-1] == y:
-##        print new[-1]
-##        #see whether we should go random
-##        if total_rand < randomness and random.choice([True, False]):
-##            a = allowed_locs(new[-1], new)
-##            new.append(random.choice(a*2))
-##            total_rand += 1
-##        #test each pixel touching x
-##        else:
-##            a = allowed_locs(new[-1], new)
-##            cur = [None, 999]
-##            for i in a:
-##                if get_dis(i, y) < cur[1]:
-##                    cur = [i, get_dis(i, y)]
-##            new.append(cur[0])
-##    return new
-
-##def connect_landmass(x, y):
-##    #get closest points
-##    cur = [None, 999]
-##    for i in x:
-##        for j in y:
-##            if get_dis(i, j) < cur[1]:
-##                cur[0] = [i, j]
-##                cur[1] = get_dis(i, j)
-##
-##    a = get_pos_between(cur[0][0], cur[0][1])
-##    print a
-
-##def connect_landmass(x, y):
-##    cur = [None, 999]
-##    for i in x:
-##        for j in y:
-##            print i, j
-##            if get_dis(i, j) < cur[1]:
-##                cur[0] = [i, j]
-##                cur[1] = get_dis(i, j)
-##
-##    a, b = cur[0]
-####    print a, b
-##
-##def make_one_landmass(grid):
-##    lm = get_landmass(grid)
-##    topthree = []
-##    for i in xrange(3):
-##        t = max(lm)
-##        lm.remove(t)
-##        topthree.append(t)
-##
-##    connect_landmass(topthree[0], topthree[1])
 
 def make_random_map(dim=(16, 16), density=60):
     amount_land = dim[0]*dim[1] * (0.01 * density)
@@ -185,8 +105,12 @@ def make_random_map(dim=(16, 16), density=60):
                 lifes = 0
 
     #remove islands
-##    g = make_one_landmass(g)
-    print len(get_landmass(g))
+    a = get_landmass(g)
+    cur = 0
+    for i in a:
+        cur += 1
+        for val in i:
+            g[val[1]][val[0]] = cur
     return g
 ##
 ##for i in make_random_map(density=60):
