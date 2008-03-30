@@ -128,5 +128,3 @@ def make_random_map(dim=(16, 16), density=70):
     for i in cur:
         new[i[1]][i[0]] = 1
     return new
-for i in make_random_map():
-    print i
