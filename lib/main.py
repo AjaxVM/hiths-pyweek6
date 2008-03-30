@@ -44,4 +44,3 @@ def main():
                           world.tile_size[0], world.tile_size[1]),
                          1)
         pygame.display.flip()
-main()
