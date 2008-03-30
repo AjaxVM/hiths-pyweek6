@@ -54,6 +54,12 @@ def inmass(x, mass):
             return True
     return False
 
+def connected_mass(x, y):
+    for a in x:
+        if inmass(a, y):
+            return True
+    return False
+
 def get_landmass(grid):
     all = []
 
@@ -69,10 +75,17 @@ def get_landmass(grid):
                         break
                 if not im:
                     all.append([pos])
+
+    for mass in all:
+        for m2 in all:
+            if not mass == m2:
+                if connected_mass(mass, m2):
+                    mass.extend(m2)
+                    all.remove(m2)
     return all
 
 def make_random_map(dim=(16, 16), density=60):
-    amount_land = dim[0]*dim[1] * (0.01 * density)
+    amount_land = int(dim[0]*dim[1] * (0.01 * density))
 
     g = []
     am_water = False
@@ -106,11 +119,11 @@ def make_random_map(dim=(16, 16), density=60):
 
     #remove islands
     a = get_landmass(g)
-    cur = 0
-    for i in a:
-        cur += 1
-        for val in i:
-            g[val[1]][val[0]] = cur
+##    cur = 0
+##    for i in a:
+##        cur += 1
+##        for val in i:
+##            g[val[1]][val[0]] = cur
     return g
 ##
 ##for i in make_random_map(density=60):
