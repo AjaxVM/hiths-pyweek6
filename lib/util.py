@@ -84,7 +84,7 @@ def get_landmass(grid):
                     all.remove(m2)
     return all
 
-def make_random_map(dim=(16, 16), density=60):
+def make_random_map(dim=(16, 16), density=70):
     amount_land = int(dim[0]*dim[1] * (0.01 * density))
 
     g = []
@@ -119,6 +119,14 @@ def make_random_map(dim=(16, 16), density=60):
 
     #remove islands
     a = get_landmass(g)
-    return g
+    cur = []
+    for i in a:
+        if len(i) > len(cur):
+            cur = i
 
-    
+    new = [[0 for i in xrange(dim[0])] for u in xrange(dim[1])]
+    for i in cur:
+        new[i[1]][i[0]] = 1
+    return new
+for i in make_random_map():
+    print i
