@@ -118,13 +118,4 @@ def make_random_map(dim=(16, 16), density=60):
                 lifes = 0
 
     #remove islands
-    a = get_landmass(g)
-##    cur = 0
-##    for i in a:
-##        cur += 1
-##        for val in i:
-##            g[val[1]][val[0]] = cur
-    return g
-##
-##for i in make_random_map(density=60):
-##    print i
+    a = get_landmass(g)    return g
