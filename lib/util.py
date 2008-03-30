@@ -118,4 +118,7 @@ def make_random_map(dim=(16, 16), density=60):
                 lifes = 0
 
     #remove islands
-    a = get_landmass(g)    return g
+    a = get_landmass(g)
+    return g
+
+    
