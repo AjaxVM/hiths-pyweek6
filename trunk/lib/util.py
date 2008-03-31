@@ -1,4 +1,5 @@
 import random
+from pygame import Rect
 
 def get_random_start(dim, avoid=[], total=-1):
     #first, cut the map into 9 areas, see where all the sees land, and then picka random area to go to :D
@@ -196,3 +197,106 @@ def split_terr(grid):
             grid[x[1]][x[0]] = colors[cur-1]
 
     return grid
+
+def get_territories(grid):
+    terr = {}
+    for y in xrange(len(grid)):
+        for x in xrange(len(grid[0])):
+            if grid[y][x] in terr:
+                terr[grid[y][x]].append([x, y])
+            else:
+                terr[grid[y][x]] = [[x, y]]
+
+    new = []
+    for i in terr:
+        new.append(terr[i])
+    return new
+
+def any_to_the_left(x, terr):
+    for i in terr:
+        if i == x:continue
+        if x[0] - i[0] == 1:
+            return True
+    return False
+
+def any_to_the_right(x, terr):
+    for i in terr:
+        if i == x:continue
+        if i[0] - x[0] == 1:
+            return True
+    return False
+
+def any_to_the_top(x, terr):
+    for i in terr:
+        if i == x:continue
+        if x[1] - i[1] == 1:
+            return True
+    return False
+
+def any_to_the_bottom(x, terr):
+    for i in terr:
+        if i == x:continue
+        if i[1] - x[1] == 1:
+            return True
+    return False
+
+def is_border_touching_two(b, terr):
+    t = 0
+    n = b[0]
+    for i in terr:
+        r = Rect(i[0], i[1], 1, 1)
+        if n.colliderect(r):
+            t += 1
+    return t >= 2
+
+##def get_points(terr):
+##    left = []
+##    right = []
+##    top = []
+##    bottom = []
+##    for i in terr:
+##        if not any_to_the_left(i, terr):
+##            left.append(i)
+##        if not any_to_the_right(i, terr):
+##            right.append(i)
+##        if not any_to_the_top(i, terr):
+##            top.append(i)
+##        if not any_to_the_bottom(i, terr):
+##            bottom.append(i)
+##    points = []
+##    for i in left:
+##        points.append([i, [i[0], i[1]+1]])
+##    for i in right:
+##        points.append([[i[0]+1, i[1]], [i[0]+1, i[1]+1]])
+##    for i in top:
+##        points.append([i, [i[0]+1, i[1]]])
+##    for i in bottom:
+##        points.append([[i[0], i[1]+1], [i[0]+1, i[1]+1]])
+##    return points
+##def get_outline_terr(terr):
+##    points = []
+##    for i in terr:
+##        if any_to_the_left(i, terr):
+##
+
+def get_points(terr):
+    points = []
+    for i in terr:
+##        points.append([i, [i[0], i[1]+1]])
+##        points.append([[i[0]+1, i[1]], [i[0]+1, i[1]+1]])
+##        points.append([i, [i[0]+1, i[1]]])
+##        points.append([[i[0], i[1]+1], [i[0]+1, i[1]+1]])
+        points.append([Rect(i[0]-1, i[1], 2, 1),
+                       [i, [i[0], i[1]+1]]])
+        points.append([Rect(i[0], i[1], 2, 1),
+                       [[i[0]+1, i[1]], [i[0]+1, i[1]+1]]])
+        points.append([Rect(i[0], i[1]-1, 1, 2),
+                       [i, [i[0]+1, i[1]]]])
+        points.append([Rect(i[0], i[1], 1, 2),
+                       [[i[0], i[1]+1], [i[0]+1, i[1]+1]]])
+
+    new = []
+    for i in points:
+        if not is_border_touching_two(i, terr):
+            new.append(i[1])
+    return new
