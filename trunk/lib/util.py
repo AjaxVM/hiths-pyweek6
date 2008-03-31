@@ -173,7 +173,9 @@ def split_terr(grid):
             n = list(i)
             random.shuffle(n)
             for cell in n:
-                for x in [[-1,0], [1,0], [0,-1], [0,1]]:
+                bah = [[-1,0], [1,0], [0,-1], [0,1]]
+                random.shuffle(bah)
+                for x in bah:
                     if not done:
                         new = [cell[0] + x[0], cell[1] + x[1]]
                         if new[0] >= 0 and new[0] < dim[0] and\
