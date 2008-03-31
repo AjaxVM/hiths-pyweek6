@@ -26,7 +26,7 @@ class MapGrid(object):
 
 
 class World(object):
-    def __init__(self, surface, tile_size=(30, 15),
+    def __init__(self, surface, tile_size=(15, 10),
                  map_grid=None, background=None):
 
         self.tile_size = tile_size
@@ -88,10 +88,6 @@ class World(object):
         for y in self.grid.grid:
             xpos = 0
             for x in y:
-##                if x in img:
-##                    self.display.blit(img[x], (xpos * tx - dx,
-##                                               ypos * ty - dy))
-##                else:
                 if col[x]:
                     r = (xpos * tx - dx, ypos * ty - dy,
                          tx, ty)

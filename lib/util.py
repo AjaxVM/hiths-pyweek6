@@ -27,7 +27,7 @@ def get_random_start(dim, avoid=[], total=-1):
                 spot = [random.randint(0, dim[0]-1), random.randint(0, dim[1]-1)]
                 while spot in avoid:
                     spot = [random.randint(0, dim[0]-1), random.randint(0, dim[1]-1)]
-                return spot
+                return spots
             return None
         else:
             spot = [random.randint(0, dim[0]-1), random.randint(0, dim[1]-1)]
@@ -92,7 +92,7 @@ def get_landmass(grid):
                     all.remove(m2)
     return all
 
-def make_random_map(dim=(20, 20), density=70):
+def make_random_map(dim=(30, 30), density=70):
     amount_land = int(dim[0]*dim[1] * (0.01 * density))
 
     g = []
@@ -136,6 +136,7 @@ def make_random_map(dim=(20, 20), density=70):
     for i in cur:
         new[i[1]][i[0]] = 1
     return split_terr(new)
+##    return new
 
 
 def split_terr(grid):
@@ -152,33 +153,44 @@ def split_terr(grid):
     random.shuffle(good)
     picked = []
 
-    for i in xrange(14):
-        a = random.choice(good)
-        picked.append([a])
-        good.remove(a)
-
     avoid = []
     for y in xrange(dim[1]):
         for x in xrange(dim[0]):
             if grid[y][x] == 0:
                 avoid.append([x, y])
 
+    for i in xrange(28):
+        a = random.choice(good)
+        picked.append([a])
+        good.remove(a)
+        avoid.append(a)
 
-    while len(avoid) < dim[0] * dim[1]:
+    finished = []
+
+    while picked:
         for i in picked:
-            go = random.choice(i)
-            new = get_random_adj(go, dim, avoid)
-            if new:
-                i.append(new)
-                avoid.append(new)
+            done = False
+            n = list(i)
+            random.shuffle(n)
+            for cell in n:
+                for x in [[-1,0], [1,0], [0,-1], [0,1]]:
+                    if not done:
+                        new = [cell[0] + x[0], cell[1] + x[1]]
+                        if new[0] >= 0 and new[0] < dim[0] and\
+                           new[1] >= 0 and new[1] < dim[1]:
+                            if not new in avoid:
+                                avoid.append(new)
+                                i.append(new)
+                                done = True
+            if not done:
+                finished.append(i)
+                picked.remove(i)
 
     cur = 0
-    for i in picked:
+    colors = [1,2,3,4,5,6,7] * 4
+    for i in finished:
         cur += 1
         for x in i:
-            grid[x[1]][x[0]] = cur
+            grid[x[1]][x[0]] = colors[cur-1]
 
     return grid
-
-##for i in make_random_map():
-##    print i
