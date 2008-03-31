@@ -26,7 +26,7 @@ class MapGrid(object):
 
 
 class World(object):
-    def __init__(self, surface, tile_size=(30, 15),
+    def __init__(self, surface, tile_size=(15, 10),
                  map_grid=None, background=None):
 
         self.tile_size = tile_size
@@ -80,6 +80,8 @@ class World(object):
 
         img = self.__images
 
+        f = pygame.font.Font(None, 14)
+
 
         tx, ty = self.tile_size
 
@@ -104,6 +106,7 @@ class World(object):
                     pygame.draw.rect(self.display, (125, 125, 125), r)
                 else:
                     pygame.draw.rect(self.display, col[x%7], r)
+                self.display.blit(f.render(str(x), 1, (0,0,0)), [r[0], r[1]])
                 xpos += 1
             ypos += 1
 

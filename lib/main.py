@@ -30,6 +30,10 @@ def main():
                     pygame.image.save(screen, os.path.join("data", "screenshots",
                                                            "screenie %s.jpg"%a))
 
+                if event.key == K_SPACE:
+                    world.map_size=()
+                    world.grid = MapGrid(util.make_random_map())
+
         screen.fill((0,0,0))
         world.render()
 
