@@ -1,0 +1,117 @@
+resize_image(image, size)
+  returns a new image that splits the original image into nine parts, scales the center one to fill the middle,
+  and then tiles the rest of the images to scale the image without distortion.
+
+
+App (surface, background_color=(0,0,0))
+  The App is the top-level widget, into which you should place all widgets
+----surface is the pygame.Surface that you use to render the widgets on
+----background_color is None or the color that the app will use to fill the surface every render
+    if None, the screenn will not be cleared when the app redraws - useful in games where you are already
+    clearing the screen every frame.
+----widgets is a list of widgets that belong to this app
+----theme is a theme.Theme object
+----dirty is a bool that keeps track of whether the app needs to be re-rendered or not
+
+--move_to_top(other)
+    other is a widget from the group of widgets in the app, moves other to top of stack.
+--get_mouse_pos()
+    returns pygame.mouse.get_pos()
+--force_update()
+    sets "dirty" to True, causes app to re-render
+--add_widget(widg)
+    appends widg to stack of widgets
+--remove_widget(name)
+    removes top widget with widget.name == name
+--get_events()
+    gathers all events from a pygame.event.get() call, then returns any events that the GUI does not use,
+    or that the GUI is returning, like button-click events
+--render()
+    if dirty, re-renders App and all widgets, always returns surface
+
+
+Widget(parent, pos=(-1,-1), name="", widget_pos="topleft", theme=None)
+  The top-level widget that all (almost) Widgets should inherit from.
+----parent is the App or a parent Widget that this widget is stored in,
+    of theme is None, then theme = copy(parent.theme)
+----pos is the (x, y) pos of the widget, if either value is -1,
+    then that value will be centered on the parents surface
+----name is a string identifier of this widget, used to remove the widget from the parent,
+    or to see if it generated and event
+----widget_pos is the pygame.Rect attribute that is used to position the widgets rect on pos,
+    e.g. "topleft", "center", "midright", etc.
+----theme is an overide theme that causes this widget to use it, instead of it's parent's theme
+
+--render(surface)
+    does nothing, just a place-holder
+--get_mouse_pos()
+    returns pygame.mouse.get_pos()
+--force_update()
+    calls parent.force_update()
+--event(event)
+    does nothing, returns event, just a place-holder
+--move(off=(0,0))
+    moves widget by off, calls force_update()
+--combine_images(images)
+    strings images together into one image
+--not_active()
+    place-holder, does nothing
+
+
+Label(Widget) (parent, pos, name, text, widget_pos="topleft", theme=None, icon=None)
+  A simple widget that displays some text, an icon, and a background.
+----calls Widget.__init__(parent, pos, name, widget_pos, theme)
+----text is the text the widget displays
+----icon is None or the "path/to/image.***" that will be displayed to the left of the text
+----over_width is None or an overriding width that forces the label to be a certain size
+
+--make_image()
+    builds the labels image for rendering, includes background, icon and text
+--render(surface)
+    blits image to surface
+
+
+Button(Widget) (parent, pos, name, text, widget_pos="topleft", theme=None, icon=None)
+  A simple button widget.
+----calls Widget.__init__(parent, pos, name, widget_pos, theme)
+----text is the text that the button renders
+----icon is None or the "path/to/image.***" of an image to be rendered next to the text
+----over_width is an overriding width that forces the button to be that size
+----over_height is the same as over_width, only for the height ;)
+
+--not_active()
+    forces the widget to reset an lose focus
+--make_image()
+    like Label.make_image(), exept for each state of the button
+--render(surface)
+    blits the current button state image to surface
+--change_image(new)
+    sets current state image to new, forces update
+--event(event)
+    handles event, returns event if not used, None, or a button click event
+
+
+Area(Widget) (parent, name="", widget_pos="topleft", theme=None, size=(50,50))
+  The area that a widget renders on
+----calls Area.__init__(parent, name="", widget_pos="topleft", theme=None, size=(50,50))
+
+
+MenuList(Widget) (parent, pos, name="", buttons=["None"], widget_pos="topleft", theme=None, icons={"None":None})
+  A widget that displays a list of items (such as a file browser)
+----calls MenuList.__init__(parent, pos, name="", buttons=["None"], widget_pos="topleft", theme=None, icons={"None":None}):
+
+
+Menu(Widget) (parent, pos, name, text, buttons=["None"], icons={"None":None}, widget_pos="topleft", icon=None, theme=None)
+  A dropdown menu that works the same as MenuList
+----calls Menu.__init__(parent, pos, name, text, buttons=["None"], icons={"None":None}, widget_pos="topleft", icon=None, theme=None)
+
+
+TextInputBox(Widget) (parent, pos, name, prompt, starting_text, size = 25, widget_pos="topleft", theme=None)
+  A basic text input box
+----calls TextInputBox.__init__(parent, pos, name, prompt, starting_text, size = 25, widget_pos="topleft", theme=None)
+
+
+Window(Widget) (parent, pos, name, widget_pos="topleft", size=(50, 50), caption="", icon=None)
+  A movable window widget
+----calls Window.__init__(parent, pos, name, widget_pos="topleft", size=(50, 50), caption="", icon=None)
+
