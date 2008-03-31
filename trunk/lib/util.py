@@ -136,9 +136,61 @@ def make_random_map(dim=(30, 30), density=70):
     new = [[0 for i in xrange(dim[0])] for u in xrange(dim[1])]
     for i in cur:
         new[i[1]][i[0]] = 1
-    return split_terr(new)
-##    return new
 
+    new = split_terr(new)
+
+    terr = get_territories(new)
+    for i in terr:
+        x = i[0]
+        if new[x[1]][x[0]] == 1:
+            for x in i:
+                new[x[1]][x[0]] = 0
+        elif new[x[1]][x[0]] == 29:
+            for x in i:
+                new[x[1]][x[0]] = 1
+
+    while 1:
+        terr = get_territories(new)
+        a = get_bad_terr(terr)
+        if a:
+            x = a[-1]
+            random.shuffle(x)
+            for i in x:
+                p = get_random_adj2(i, dim)
+                if p:
+                    new[p[1]][p[0]] = new[i[1]][i[0]]
+                    x.append(p)
+                else:
+                    pass
+        else:
+            break
+    return new
+
+def get_random_adj2(spot, dim):
+    available = []
+
+    for val in [[spot[0]-1, spot[1]],
+                [spot[0]+1, spot[1]],
+                [spot[0], spot[1]-1],
+                [spot[0], spot[1]+1],
+                [spot[0]-1, spot[1]-1],
+                [spot[0]-1, spot[1]+1],
+                [spot[0]+1, spot[1]-1],
+                [spot[0]+1, spot[1]+1]]:
+        if val[0] >= 0 and val[0] < dim[0] and\
+           val[1] >= 0 and val[1] < dim[1]:
+            available.append(val)
+    if available:
+        return random.choice(available)
+    return None
+        
+
+def get_bad_terr(terr):
+    bad = []
+    for i in terr:
+        if len(i) < 5:
+            bad.append(i)
+    return bad
 
 def split_terr(grid):
     dim = len(grid[0]), len(grid)
@@ -160,7 +212,7 @@ def split_terr(grid):
             if grid[y][x] == 0:
                 avoid.append([x, y])
 
-    for i in xrange(28):
+    for i in xrange(29):
         a = random.choice(good)
         picked.append([a])
         good.remove(a)
@@ -176,25 +228,25 @@ def split_terr(grid):
             for cell in n:
                 bah = [[-1,0], [1,0], [0,-1], [0,1]]
                 random.shuffle(bah)
-                for x in bah:
-                    if not done:
-                        new = [cell[0] + x[0], cell[1] + x[1]]
-                        if new[0] >= 0 and new[0] < dim[0] and\
-                           new[1] >= 0 and new[1] < dim[1]:
-                            if not new in avoid:
-                                avoid.append(new)
-                                i.append(new)
-                                done = True
+                if not done:
+                    for x in bah:
+                        if not done:
+                            new = [cell[0] + x[0], cell[1] + x[1]]
+                            if new[0] >= 0 and new[0] < dim[0] and\
+                               new[1] >= 0 and new[1] < dim[1]:
+                                if not new in avoid:
+                                    avoid.append(new)
+                                    i.append(new)
+                                    done = True
             if not done:
                 finished.append(i)
                 picked.remove(i)
 
     cur = 0
-    colors = [1,2,3,4,5,6,7] * 4
     for i in finished:
         cur += 1
         for x in i:
-            grid[x[1]][x[0]] = colors[cur-1]
+            grid[x[1]][x[0]] = cur
 
     return grid
 
@@ -249,43 +301,9 @@ def is_border_touching_two(b, terr):
             t += 1
     return t >= 2
 
-##def get_points(terr):
-##    left = []
-##    right = []
-##    top = []
-##    bottom = []
-##    for i in terr:
-##        if not any_to_the_left(i, terr):
-##            left.append(i)
-##        if not any_to_the_right(i, terr):
-##            right.append(i)
-##        if not any_to_the_top(i, terr):
-##            top.append(i)
-##        if not any_to_the_bottom(i, terr):
-##            bottom.append(i)
-##    points = []
-##    for i in left:
-##        points.append([i, [i[0], i[1]+1]])
-##    for i in right:
-##        points.append([[i[0]+1, i[1]], [i[0]+1, i[1]+1]])
-##    for i in top:
-##        points.append([i, [i[0]+1, i[1]]])
-##    for i in bottom:
-##        points.append([[i[0], i[1]+1], [i[0]+1, i[1]+1]])
-##    return points
-##def get_outline_terr(terr):
-##    points = []
-##    for i in terr:
-##        if any_to_the_left(i, terr):
-##
-
 def get_points(terr):
     points = []
     for i in terr:
-##        points.append([i, [i[0], i[1]+1]])
-##        points.append([[i[0]+1, i[1]], [i[0]+1, i[1]+1]])
-##        points.append([i, [i[0]+1, i[1]]])
-##        points.append([[i[0], i[1]+1], [i[0]+1, i[1]+1]])
         points.append([Rect(i[0]-1, i[1], 2, 1),
                        [i, [i[0], i[1]+1]]])
         points.append([Rect(i[0], i[1], 2, 1),
