@@ -1,6 +1,6 @@
 import random
 
-def get_random_start(dim, avoid=[]):
+def get_random_start(dim, avoid=[], total=-1):
     #first, cut the map into 9 areas, see where all the sees land, and then picka random area to go to :D
     quadsize = int(dim[0] / 3), int(dim[1] / 3)
     quads = [[0,0], [0,1], [0,2],
@@ -22,10 +22,18 @@ def get_random_start(dim, avoid=[]):
         return spot
     else:
         #just pick somewhere then!
-        spot = [random.randint(0, dim[0]-1), random.randint(0, dim[1]-1)]
-        while spot in avoid:
+        if total > 0:
+            if len(avoid) < total:
+                spot = [random.randint(0, dim[0]-1), random.randint(0, dim[1]-1)]
+                while spot in avoid:
+                    spot = [random.randint(0, dim[0]-1), random.randint(0, dim[1]-1)]
+                return spot
+            return None
+        else:
             spot = [random.randint(0, dim[0]-1), random.randint(0, dim[1]-1)]
-        return spot
+            while spot in avoid:
+                spot = [random.randint(0, dim[0]-1), random.randint(0, dim[1]-1)]
+            return spot
 
 def get_random_adj(spot, dim, avoid=[]):
     if spot:
@@ -84,7 +92,7 @@ def get_landmass(grid):
                     all.remove(m2)
     return all
 
-def make_random_map(dim=(16, 16), density=70):
+def make_random_map(dim=(20, 20), density=70):
     amount_land = int(dim[0]*dim[1] * (0.01 * density))
 
     g = []
@@ -113,7 +121,7 @@ def make_random_map(dim=(16, 16), density=70):
             all_water.append(spot)
             spot = get_random_adj(spot, dim, all_water)
             lifes += 1
-            if lifes >= int(max_water/8):
+            if lifes >= int(max_water/4):
                 spot = None
                 lifes = 0
 
@@ -127,4 +135,50 @@ def make_random_map(dim=(16, 16), density=70):
     new = [[0 for i in xrange(dim[0])] for u in xrange(dim[1])]
     for i in cur:
         new[i[1]][i[0]] = 1
-    return new
+    return split_terr(new)
+
+
+def split_terr(grid):
+    dim = len(grid[0]), len(grid)
+
+    #pick 14 start pos's then we'll search and add all tils to them...
+    ac = []
+    for y in xrange(dim[1]):
+        for x in xrange(dim[0]):
+            if grid[y][x] == 1:
+                ac.append([x, y])
+
+    good = list(ac)
+    random.shuffle(good)
+    picked = []
+
+    for i in xrange(14):
+        a = random.choice(good)
+        picked.append([a])
+        good.remove(a)
+
+    avoid = []
+    for y in xrange(dim[1]):
+        for x in xrange(dim[0]):
+            if grid[y][x] == 0:
+                avoid.append([x, y])
+
+
+    while len(avoid) < dim[0] * dim[1]:
+        for i in picked:
+            go = random.choice(i)
+            new = get_random_adj(go, dim, avoid)
+            if new:
+                i.append(new)
+                avoid.append(new)
+
+    cur = 0
+    for i in picked:
+        cur += 1
+        for x in i:
+            grid[x[1]][x[0]] = cur
+
+    return grid
+
+##for i in make_random_map():
+##    print i

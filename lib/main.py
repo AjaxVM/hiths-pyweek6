@@ -5,11 +5,12 @@ import util
 
 import random
 
+
 def main():
     pygame.init()
     screen = pygame.display.set_mode((640, 480))
 
-    mg = MapGrid({1:(255,255,255),
+    mg = MapGrid({1:(150,90,110),
                   2:(255,0,255),
                   3:(255,0,0),
                   4:(255,255,0),
@@ -22,7 +23,7 @@ def main():
                   11:(125,125,0),
                   12:(0,125,125),
                   13:(0,0,125),
-                  14:(0,125,0),
+                  14:(0,0,255),
                   0:None},
                  util.make_random_map())
 
