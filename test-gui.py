@@ -2,15 +2,16 @@
 import pygame
 from pygame.locals import *
 
+import os, sys
+sys.path.append('lib')
 import gui
-reload(gui)
 
 def main():
     pygame.init()
     screen = pygame.display.set_mode((640, 480))
 
     app = gui.App(pygame.Surface((640, 480)))
-    mytheme = gui.make_theme("default_theme")
+    mytheme = gui.make_theme(os.path.join("data", "gui"))
     app.theme = mytheme
 
     main_win = gui.Window(app, (640, 40), "MainWindow", "topright",

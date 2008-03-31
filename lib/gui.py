@@ -8,7 +8,7 @@ from theme import make_theme, Theme
 
 class App(object):
     def __init__(self, surface,
-                 background_color=None):
+                 background_color=(0,0,0)):
 
         self.surface = surface
 
