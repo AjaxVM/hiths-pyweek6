@@ -5,6 +5,8 @@ import util
 
 import random
 
+import time, os
+
 
 def main():
     pygame.init()
@@ -27,6 +29,12 @@ def main():
             if event.type == QUIT:
                 pygame.quit()
                 return
+            if event.type == KEYDOWN:
+                if event.key == K_s:
+                    a = time.localtime()
+                    a = "%s-%s-%s-%s"%(a[1], a[2], a[3], a[4])
+                    pygame.image.save(screen, os.path.join("data", "screenshots",
+                                                           "screenie %s.bmp"%a))
 
         screen.fill((0,0,0))
         world.render()
