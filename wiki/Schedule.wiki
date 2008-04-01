@@ -44,7 +44,7 @@ Finish gui layout/lobby
 
 Testing
 
-Help/map-making-parameters-in-lobby/SinglePlayer/etc screens
+Help/map-making-parameters-in-lobby/single-player/etc screens
 
 Polish
 
