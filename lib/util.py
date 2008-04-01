@@ -93,7 +93,7 @@ def get_landmass(grid):
                     all.remove(m2)
     return all
 
-def make_random_map(dim=(30, 30), density=70):
+def make_random_map(dim=(40, 40), density=70):
     amount_land = int(dim[0]*dim[1] * (0.01 * density))
 
     g = []
