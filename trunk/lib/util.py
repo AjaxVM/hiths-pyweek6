@@ -148,22 +148,6 @@ def make_random_map(dim=(30, 30), density=70):
         elif new[x[1]][x[0]] == 29:
             for x in i:
                 new[x[1]][x[0]] = 1
-
-    while 1:
-        terr = get_territories(new)
-        a = get_bad_terr(terr)
-        if a:
-            x = a[-1]
-            random.shuffle(x)
-            for i in x:
-                p = get_random_adj2(i, dim)
-                if p:
-                    new[p[1]][p[0]] = new[i[1]][i[0]]
-                    x.append(p)
-                else:
-                    pass
-        else:
-            break
     return new
 
 def get_random_adj2(spot, dim):
@@ -184,13 +168,6 @@ def get_random_adj2(spot, dim):
         return random.choice(available)
     return None
         
-
-def get_bad_terr(terr):
-    bad = []
-    for i in terr:
-        if len(i) < 5:
-            bad.append(i)
-    return bad
 
 def split_terr(grid):
     dim = len(grid[0]), len(grid)
