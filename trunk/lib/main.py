@@ -16,7 +16,11 @@ def main():
 
     mg = MapGrid(util.make_random_map())
 
+    p = Player(mg.comp_terrs[0], (255, 0, 0))
+    p.territories = mg.comp_terrs
+
     world = World(world_screen, map_grid=mg)
+    world.players = [p]
 
     while 1:
         for event in pygame.event.get():
@@ -32,7 +36,11 @@ def main():
 
                 if event.key == K_SPACE:
                     world.map_size=()
-                    world.grid = MapGrid(util.make_random_map())
+                    mg = MapGrid(util.make_random_map())
+                    world.grid = mg
+                    p = Player(mg.comp_terrs[0], (255, 0, 0))
+                    p.territories = mg.comp_terrs
+                    world.players = [p]
 
         screen.fill((0,0,0))
         world.render()

@@ -18,11 +18,35 @@ class Actor(object):
 class MapGrid(object):
     def __init__(self, #images={"n":None},
                  grid = [[]]):
-##        self.images = images
         self.grid = grid
+        self.territories = util.get_territories(self.grid)[1::]
+##        self.terr_points = [util.get_points(i) for i in self.territories]
+        self.comp_terrs = []
+        for i in self.territories:
+            self.comp_terrs.append(PlayerTerritory(None, i, 0))
 
     def get_dimensions(self):
         return len(self.grid[0]), len(self.grid)
+
+class PlayerTerritory(object):
+    def __init__(self, player, terr, units):
+        self.player = player
+
+        self.terr = terr
+        self.terr_points = util.get_points(self.terr)
+
+        self.units = units
+
+class Player(object):
+    def __init__(self, start_terr=None, color=(255, 255, 0)):
+        self.start_terr = start_terr
+        self.start_terr.player = self
+        self.start_terr.units = 4
+        self.territories = [self.start_terr]
+
+        self.actors = []
+
+        self.color = color
 
 
 class World(object):
@@ -39,11 +63,11 @@ class World(object):
         self.grid = map_grid
         self.offset = [0,0]
         self.map_size = ()
-        self.territories = []
-        self.terr_points = []
 
         self.__images = {}
-        self.actors = []
+##        self.actors = []
+
+        self.players = []
 
     def load_images(self, more=[]):
         self.__images = {}
@@ -72,8 +96,6 @@ class World(object):
             x *= self.tile_size[0]
             y *= self.tile_size[1]
             self.map_size = x, y
-            self.territories = util.get_territories(self.grid.grid)
-            self.terr_points = [util.get_points(i) for i in self.territories]
 
         if self.background:
             self.display.blit(self.background, (0,0))
@@ -111,18 +133,36 @@ class World(object):
             ypos += 1
 
         #render borders between territories...
-        for i in self.terr_points:
-            for x in i:
-                pygame.draw.line(self.display, [255,255,255],
-                                 [x[0][0]*self.tile_size[0]-self.offset[0],
-                                  x[0][1]*self.tile_size[1]-self.offset[1]],
-                                 [x[1][0]*self.tile_size[0]-self.offset[0],
-                                  x[1][1]*self.tile_size[1]-self.offset[1]],
-                                 1)
+##        tp = self.grid.terr_points
+##        for i in tp:
+##            for x in i:
+##                pygame.draw.line(self.display, [255,255,255],
+##                                 [x[0][0]*self.tile_size[0]-self.offset[0],
+##                                  x[0][1]*self.tile_size[1]-self.offset[1]],
+##                                 [x[1][0]*self.tile_size[0]-self.offset[0],
+##                                  x[1][1]*self.tile_size[1]-self.offset[1]],
+##                                 1)
 
-        for i in self.actors:
-            self.display.blit(img[i.image], (i.pos[0] * tx - dx,
-                                             i.pos[1] * ty - dy))
+##        for i in self.actors:
+##            self.display.blit(img[i.image], (i.pos[0] * tx - dx,
+##                                             i.pos[1] * ty - dy))
+
+        for x in self.players:
+            for i in x.territories:
+                for s in i.terr:
+                    r = (s[0] * tx - dx, s[1] * ty - dy,
+                         tx, ty)
+                    pygame.draw.rect(self.display, x.color, r)
+                for s in i.terr_points:
+                    pygame.draw.line(self.display, [255,255,255],
+                                     [s[0][0]*self.tile_size[0]-self.offset[0],
+                                      s[0][1]*self.tile_size[1]-self.offset[1]],
+                                     [s[1][0]*self.tile_size[0]-self.offset[0],
+                                      s[1][1]*self.tile_size[1]-self.offset[1]],
+                                     1)
+            for i in x.actors:
+                self.display.blit(img[i.image], (i.pos[0] * tx - dx,
+                                                 i.pos[1] * ty - dy))
 
     def get_mouse_pos(self):
         p = pygame.mouse.get_pos()
