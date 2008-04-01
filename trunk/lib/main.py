@@ -7,20 +7,64 @@ import random
 
 import time, os
 
+def make_map_players(world):
+    mg = MapGrid(util.make_random_map())
+
+    world.grid = mg
+    world.map_size = ()
+
+    players = []
+    pterr = list(mg.comp_terrs)
+    random.shuffle(pterr)
+##    p = Player(mg.comp_terrs[0], (255, 0, 0))
+##    p.territories = mg.comp_terrs
+##    for i in xrange(7):
+##        new = Player
+    new = Player(mg.comp_terrs[0], (255, 0, 0))
+    new.territories = mg.comp_terrs[0:4]
+    players.append(new)
+
+    new = Player(mg.comp_terrs[4], (0, 255, 0))
+    new.territories = mg.comp_terrs[4:8]
+    players.append(new)
+
+    new = Player(mg.comp_terrs[8], (0, 0, 255))
+    new.territories = mg.comp_terrs[8:12]
+    players.append(new)
+
+    new = Player(mg.comp_terrs[12], (255, 255, 0))
+    new.territories = mg.comp_terrs[12:16]
+    players.append(new)
+
+    new = Player(mg.comp_terrs[16], (255, 0, 255))
+    new.territories = mg.comp_terrs[16:20]
+    players.append(new)
+
+    new = Player(mg.comp_terrs[20], (0, 255, 255))
+    new.territories = mg.comp_terrs[20:24]
+    players.append(new)
+
+    new = Player(mg.comp_terrs[24], (255, 125, 125))
+    new.territories = mg.comp_terrs[24:28]
+    players.append(new)
+
+    world.players = players
+
 
 def main():
     pygame.init()
     screen = pygame.display.set_mode((640, 480))
 ##    world_screen = pygame.Surface((640, 300))
-    world_screen = screen.subsurface((0, 0, 640, 300))
+    world_screen = screen.subsurface((0, 0, 640, 320))
 
     mg = MapGrid(util.make_random_map())
 
-    p = Player(mg.comp_terrs[0], (255, 0, 0))
-    p.territories = mg.comp_terrs
+##    p = Player(mg.comp_terrs[0], (255, 0, 0))
+##    p.territories = mg.comp_terrs
 
     world = World(world_screen, map_grid=mg)
-    world.players = [p]
+##    world.players = [p]
+    make_map_players(world)
 
     while 1:
         for event in pygame.event.get():
@@ -35,12 +79,13 @@ def main():
                                                            "screenie %s.jpg"%a))
 
                 if event.key == K_SPACE:
-                    world.map_size=()
+##                    world.map_size=()
                     mg = MapGrid(util.make_random_map())
                     world.grid = mg
-                    p = Player(mg.comp_terrs[0], (255, 0, 0))
-                    p.territories = mg.comp_terrs
-                    world.players = [p]
+##                    p = Player(mg.comp_terrs[0], (255, 0, 0))
+##                    p.territories = mg.comp_terrs
+##                    world.players = [p]
+                    make_map_players(world)
 
         screen.fill((0,0,0))
         world.render()

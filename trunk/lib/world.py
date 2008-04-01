@@ -50,7 +50,7 @@ class Player(object):
 
 
 class World(object):
-    def __init__(self, surface, tile_size=(15, 10),
+    def __init__(self, surface, tile_size=(15, 8),
                  map_grid=None, background=None):
 
         self.tile_size = tile_size
@@ -102,8 +102,6 @@ class World(object):
 
         img = self.__images
 
-        f = pygame.font.Font(None, 14)
-
 
         tx, ty = self.tile_size
 
@@ -111,50 +109,34 @@ class World(object):
 
         dx, dy = self.offset
 
-        ypos = 0
-        col = {1: (255, 0, 0),
-                    2: (0, 255, 0),
-                    3: (0, 0, 255),
-                    4: (255, 255, 0),
-                    5: (255, 0, 255),
-                    6: (0, 255, 255),
-                  0:(0,125,0)}
-        for y in self.grid.grid:
-            xpos = 0
-            for x in y:
-                r = (xpos * tx - dx, ypos * ty - dy,
-                     tx, ty)
-                if x == 0:
-                    pygame.draw.rect(self.display, (125, 125, 125), r)
-                else:
-                    pygame.draw.rect(self.display, col[x%7], r)
-                self.display.blit(f.render(str(x), 1, (0,0,0)), [r[0], r[1]])
-                xpos += 1
-            ypos += 1
+##        ypos = 0
+##        col = {1: (255, 0, 0),
+##                    2: (0, 255, 0),
+##                    3: (0, 0, 255),
+##                    4: (255, 255, 0),
+##                    5: (255, 0, 255),
+##                    6: (0, 255, 255),
+##                  0:(0,125,0)}
+##        for y in self.grid.grid:
+##            xpos = 0
+##            for x in y:
+##                r = (xpos * tx - dx, ypos * ty - dy,
+##                     tx, ty)
+##                if x == 0:
+##                    pygame.draw.rect(self.display, (255, 255, 255), r)
+##                xpos += 1
+##            ypos += 1
 
-        #render borders between territories...
-##        tp = self.grid.terr_points
-##        for i in tp:
-##            for x in i:
-##                pygame.draw.line(self.display, [255,255,255],
-##                                 [x[0][0]*self.tile_size[0]-self.offset[0],
-##                                  x[0][1]*self.tile_size[1]-self.offset[1]],
-##                                 [x[1][0]*self.tile_size[0]-self.offset[0],
-##                                  x[1][1]*self.tile_size[1]-self.offset[1]],
-##                                 1)
-
-##        for i in self.actors:
-##            self.display.blit(img[i.image], (i.pos[0] * tx - dx,
-##                                             i.pos[1] * ty - dy))
+        self.display.fill((255,255,255))
 
         for x in self.players:
             for i in x.territories:
-                for s in i.terr:
+                for s in i.terr: #render territories
                     r = (s[0] * tx - dx, s[1] * ty - dy,
                          tx, ty)
                     pygame.draw.rect(self.display, x.color, r)
-                for s in i.terr_points:
-                    pygame.draw.line(self.display, [255,255,255],
+                for s in i.terr_points: #render borders
+                    pygame.draw.line(self.display, [0,0,0],
                                      [s[0][0]*self.tile_size[0]-self.offset[0],
                                       s[0][1]*self.tile_size[1]-self.offset[1]],
                                      [s[1][0]*self.tile_size[0]-self.offset[0],
