@@ -1,0 +1,39 @@
+#summary our schedule
+
+=Saturday (start for me)=
+Basic image/map handling, directory structure.
+Done
+=Sunday=
+Random map generator.
+Done
+=Monday=
+Tweaked generator, added territories
+Done
+
+=Tuesday=
+Get all the basic game-play except formations done.
+Start on multiplayer/ai
+
+=Wednesday=
+Finish multiplayer, ai
+Begin multiplayer lobby
+
+=Thursday=
+Overflow for multiplayer/ai
+Testing...
+
+=Friday=
+Get final or placeholder images for all the gui/sprites/etc.
+Get music/sfx made/in if not already.
+Add formations.
+
+=Saturday=
+Finish/all final images/music/sfx
+Finish gui layout/lobby
+Testing
+Help/map-making-parameters-in-lobby/SinglePlayer/etc screens
+Polish
+Test
+Polish
+Py2exe
+Release
