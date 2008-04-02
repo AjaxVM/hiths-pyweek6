@@ -90,19 +90,37 @@ def main():
                         print "clicked player #%ss territory: %s"%(x[0]+1, x[1])
                         picktwo.append(x)
         if len(picktwo) == 2:
-            x, y = rules.perform_battle(picktwo[0][1], picktwo[1][1])
-            picktwo[0][1].units -= x
-            picktwo[1][1].units -= y
-            if picktwo[1][1].units == 0:
-                world.players[picktwo[1][0]].territories.remove(picktwo[1][1])
-                world.players[picktwo[0][0]].territories.append(picktwo[1][1])
+            if util.connected_mass(picktwo[0][1].terr, picktwo[1][1].terr):
+                if not picktwo[0][0] == picktwo[1][0]:
+                    x, y = rules.perform_battle(picktwo[0][1], picktwo[1][1])
+                    picktwo[0][1].units -= x
+                    picktwo[1][1].units -= y
+                    if picktwo[1][1].units == 0:
+                        world.players[picktwo[1][0]].territories.remove(picktwo[1][1])
+                        world.players[picktwo[0][0]].territories.append(picktwo[1][1])
 
-                picktwo[1][1].units = picktwo[0][1].units - 1
-                picktwo[0][1].units = 1
-            picktwo[0][1].update()
-            picktwo[1][1].update()
+                        picktwo[1][1].units = picktwo[0][1].units - 1
+                        picktwo[0][1].units = 1
+                    picktwo[0][1].update()
+                    picktwo[1][1].update()
 
-            print "casualties: %s, %s"%(x, y)
+                    print "casualties: %s, %s"%(x, y)
+                else:
+                    print "player territories - moving units"
+                    x = picktwo[0][1].units - 1
+##                    picktwo[0][1].units -= x
+##                    picktwo[1][1].units += x
+                    if picktwo[1][1].max_units >= picktwo[1][1].units + x:
+                        pass
+                    else:
+                        x = picktwo[1][1].max_units - picktwo[1][1].units
+                    picktwo[0][1].units -= x
+                    picktwo[1][1].units += x
+                    picktwo[0][1].update()
+                    picktwo[1][1].update()
+
+            else:
+                print "not touching territories"
 
             picktwo = []
 
