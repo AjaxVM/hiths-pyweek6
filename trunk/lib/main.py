@@ -84,7 +84,7 @@ def main():
                 if event.button == 1:
                     x = world.get_mouse_terr()
                     if x:
-                        print "clicked player territry: %s"%x
+                        print "clicked player #%ss territory: %s"%(x[0]+1, x[1])
 
         screen.fill((0,0,0))
         world.render()
