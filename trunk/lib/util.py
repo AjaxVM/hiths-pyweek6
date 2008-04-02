@@ -138,16 +138,6 @@ def make_random_map(dim=(40, 40), density=70):
         new[i[1]][i[0]] = 1
 
     new = split_terr(new)
-
-    terr = get_territories(new)
-    for i in terr:
-        x = i[0]
-        if new[x[1]][x[0]] == 1:
-            for x in i:
-                new[x[1]][x[0]] = 0
-        elif new[x[1]][x[0]] == 29:
-            for x in i:
-                new[x[1]][x[0]] = 1
     return new
 
 def get_random_adj2(spot, dim):
@@ -179,6 +169,11 @@ def split_terr(grid):
             if grid[y][x] == 1:
                 ac.append([x, y])
 
+    for y in xrange(dim[1]):
+        for x in xrange(dim[0]):
+            if grid[y][x] == 1:
+                grid[y][x] = "open"
+
     good = list(ac)
     random.shuffle(good)
     picked = []
@@ -189,7 +184,7 @@ def split_terr(grid):
             if grid[y][x] == 0:
                 avoid.append([x, y])
 
-    for i in xrange(29):
+    for i in xrange(28):
         a = random.choice(good)
         picked.append([a])
         good.remove(a)
@@ -224,6 +219,11 @@ def split_terr(grid):
         cur += 1
         for x in i:
             grid[x[1]][x[0]] = cur
+
+    for y in xrange(dim[1]):
+        for x in xrange(dim[0]):
+            if grid[y][x] == "open":
+                grid[y][x] = 0
 
     return grid
 

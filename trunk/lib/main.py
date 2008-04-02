@@ -93,6 +93,15 @@ def main():
                     if x:
                         print "clicked player #%ss territory: %s"%(x[0]+1, x[1])
                         picktwo.append(x)
+                if event.button == 4:
+                    #zoom in
+                    world.tile_size = [world.tile_size[0] * 2,
+                                       world.tile_size[1] * 2]
+                if event.button == 5:
+                    #zoom out
+                    if world.tile_size[1] >= 5:
+                        world.tile_size = [int(world.tile_size[0] / 2),
+                                           int(world.tile_size[1] / 2)]
 
             if event.type == gui.GUI_EVENT:
                 if event.widget == gui.Button and event.name == "End Turn":
