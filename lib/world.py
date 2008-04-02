@@ -134,7 +134,7 @@ class Player(object):
 
 
 class World(object):
-    def __init__(self, surface, tile_size=(30, 15),
+    def __init__(self, surface, tile_size=(10, 7),
                  map_grid=None, background=None):
 
         self.tile_size = tile_size
