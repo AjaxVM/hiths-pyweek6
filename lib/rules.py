@@ -9,7 +9,7 @@ troop_defense_gain = 2
 import random
 def perform_battle(terr1, terr2):
     #returns casualties1, casualties2
-    a = random.randint(terr1.units-1, (terr1.units-1) * troop_attack_gain)
+    a = random.randint(terr1.units, terr1.units * troop_attack_gain)
     b = random.randint(terr2.units, terr2.units * troop_defense_gain)
 
     if terr2.capitol:

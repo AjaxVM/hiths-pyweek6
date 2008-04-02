@@ -5,7 +5,7 @@ import random
 import pygame
 from pygame.locals import *
 
-import util
+import util, rules
 
 def sort_actors(x, y):
     if x.pos[1] < y.pos[1]:
@@ -32,7 +32,7 @@ class MapGrid(object):
                  grid = [[]]):
         self.grid = grid
         self.territories = util.get_territories(self.grid)[1::]
-##        self.terr_points = [util.get_points(i) for i in self.territories]
+
         self.comp_terrs = []
         for i in self.territories:
             self.comp_terrs.append(PlayerTerritory(None, i, 0))
@@ -55,6 +55,8 @@ class PlayerTerritory(object):
         self.supply = False
 
         self.update()
+
+        self.can_move = True
 
     def get_middle_tile(self):
         t = None
@@ -87,6 +89,9 @@ class PlayerTerritory(object):
         return closest
 
     def update(self):
+        self.max_units = len(self.terr)
+        if self.capitol:
+            self.max_units -= 1
         self.actors = []
         x = list(self.terr)
         random.shuffle(x)
@@ -116,6 +121,16 @@ class Player(object):
             i.update()
 
         self.color = color
+        self.dead = False
+
+    def end_turn(self):
+        for i in self.territories:
+            i.can_move = True
+            if i.capitol:
+                i.units += rules.capitol_troop_gain
+                if i.units > i.max_units:
+                    i.units = i.max_units
+                i.update()
 
 
 class World(object):
@@ -134,18 +149,19 @@ class World(object):
         self.map_size = ()
 
         self.__images = {}
-##        self.actors = []
 
         self.players = []
 
-##    def load_images(self, more=[]):
-##        self.__images = {}
-##        for i in self.actors:
-##            self.__images[i.image] = pygame.image.load(i.image).convert_alpha()
-##        for i in more:
-##            self.__images[i] = pygame.image.load(i).convert_alpha()
-##
-##        return None
+    def one_winner(self):
+        good=0
+        best = None
+        num = 0
+        for i in self.players:
+            if not i.dead:
+                good += 1
+                best = num
+            num += 1
+        return good == 1, best
 
     def __fix_offset(self):
         if self.offset[0] < 0:
@@ -191,11 +207,6 @@ class World(object):
                     r = (s[0] * tx - dx, s[1] * ty - dy,
                          tx, ty)
                     pygame.draw.rect(self.display, x.color, r)
-##                    for t in s:
-##                    image = self.get_image(os.path.join("data", "images", "robo1.png"))
-##                    r = self.get_image(os.path.join("data", "images", "robo1.png")).get_rect()
-##                    r.bottomleft = (s[0] * tx - dx, (s[1]+1) * ty - dy)
-##                    self.display.blit(image, r.topleft)
                 for s in i.terr_points: #render borders
                     pygame.draw.line(self.display, [0,0,0],
                                      [s[0][0]*self.tile_size[0]-self.offset[0],
@@ -210,10 +221,6 @@ class World(object):
                     r = img.get_rect()
                     r.bottomleft = (s.pos[0] * tx - dx, (s.pos[1]+1) * ty - dy)
                     self.display.blit(img, r.topleft)
-##            for i in x.actors:
-##                r = self.get_image(i.image).get_rect()
-##                r.bottom = (i.pos[0] * tx - dx, i.pos[1] * ty - dy)
-##                self.display.blit(img[i.image], r.topleft)
 
     def get_mouse_pos(self):
         p = pygame.mouse.get_pos()

@@ -17,6 +17,7 @@ class App(object):
         self.theme = None
 
         self.dirty = False
+        self.always_render = False
         self.background_color = background_color
 
     def move_to_top(self, other):
@@ -50,17 +51,21 @@ class App(object):
         return_events = []
 
         for event in pygame.event.get():
+            used = False
             for widg in self.widgets:
                 a = self.dirty
                 ret = widg.event(event)
                 if not ret == event:
+                    used = True
                     if ret:
                         return_events.append(ret)
                     break
+            if not used:
+                return_events.append(event)
         return return_events
 
     def render(self):
-        if self.dirty:
+        if self.dirty or self.always_render:
             if self.background_color:
                 self.surface.fill(self.background_color)
             self.widgets.reverse()
