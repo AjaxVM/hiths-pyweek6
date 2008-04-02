@@ -2,6 +2,7 @@ import world
 from world import *
 
 import util
+import rules
 
 import random
 
@@ -59,6 +60,8 @@ def main():
 ##    world.players = [p]
     make_map_players(world)
 
+    picktwo = []
+
     while 1:
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -85,6 +88,23 @@ def main():
                     x = world.get_mouse_terr()
                     if x:
                         print "clicked player #%ss territory: %s"%(x[0]+1, x[1])
+                        picktwo.append(x)
+        if len(picktwo) == 2:
+            x, y = rules.perform_battle(picktwo[0][1], picktwo[1][1])
+            picktwo[0][1].units -= x
+            picktwo[1][1].units -= y
+            if picktwo[1][1].units == 0:
+                world.players[picktwo[1][0]].territories.remove(picktwo[1][1])
+                world.players[picktwo[0][0]].territories.append(picktwo[1][1])
+
+                picktwo[1][1].units = picktwo[0][1].units - 1
+                picktwo[0][1].units = 1
+            picktwo[0][1].update()
+            picktwo[1][1].update()
+
+            print "casualties: %s, %s"%(x, y)
+
+            picktwo = []
 
         screen.fill((0,0,0))
         world.render()
