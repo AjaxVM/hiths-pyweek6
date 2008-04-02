@@ -226,11 +226,12 @@ class World(object):
         y = (p[1] + dy) / self.tile_size[1]
         return x, y
 
-    def get_mouse_terr(self, player=0):
+    def get_mouse_terr(self):
         x = list(self.get_mouse_pos())
-        for i in self.players[player].territories:
-            if x in i.terr:
-                return i
+        for i in self.players:
+            for j in i.territories:
+                if x in j.terr:
+                    return self.players.index(i), j
         return None
             
 
