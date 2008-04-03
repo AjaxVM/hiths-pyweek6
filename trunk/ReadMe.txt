@@ -12,4 +12,4 @@ To run the game execute "run_game.py".
 
 Requirements:
 Python 2.5 - others may work - but unsupported.
-Pygame 1.8 - might work on 1.7.1 too.
+Pygame 1.7.1 or later.
