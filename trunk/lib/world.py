@@ -124,17 +124,63 @@ class Player(object):
         self.color = color
         self.dead = False
 
+    def test_connected(self, x, y):
+        for t1 in x.terr:
+            for t2 in y.terr:
+                if util.touching(t1, t2):
+                    return True
+        return False
+
+    def get_terr_holding(self):
+        #return largest connected number of territories
+        groups = []
+        for i in self.territories:
+            if groups == []:
+                groups = [[i]]
+            else:
+                ing = False
+                for x in groups:
+                    for c in x:
+                        if self.test_connected(i, c):
+                            ing = True
+                            x.append(i)
+                            break
+                    if ing:
+                        break
+                if not ing:
+                    groups.append([i])
+        largest = 0
+        for i in groups:
+            if len(i) > largest:
+                largest = len(i)
+        return largest
+
     def end_turn(self):
+        extra = self.get_terr_holding()
+        while extra:
+            for i in self.territories:
+                if extra:
+                    use = random.randint(0, extra)
+                    if i.units + use < i.max_units:
+                        extra -= use
+                        i.units += use
+                    else:
+                        use = i.max_units - i.units
+                        extra -= use
+                        i.units += use
+                else:
+                    break
+
+
         for i in self.territories:
             i.can_move = True
             if i.capitol:
                 i.units += rules.capitol_troop_gain
             elif i.supply:
                 i.units += rules.supply_troop_gain
-            else:
-                i.units += rules.just_troops_gain
             if i.units > i.max_units:
                 i.units = i.max_units
+
             i.update()
 
 

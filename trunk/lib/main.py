@@ -150,23 +150,26 @@ def main():
 
         #BATTLES!
         if len(picktwo) == 1:
-            if not picktwo[0][0] == whos_turn:
+            if (picktwo[0][0] != whos_turn) or\
+               (picktwo[0][1].units == 1) or\
+               (not picktwo[0][1].can_move):
                 picktwo[0][1].highlighted = False
                 picktwo = []
         if len(picktwo) == 2:
             if picktwo[0][0] == whos_turn:
-                if (not picktwo[0][0] == picktwo[1][0]) and \
+                if (not picktwo[0][1] == picktwo[1][1]) and \
                    util.connected_mass(picktwo[0][1].terr, picktwo[1][1].terr):
                     if not picktwo[0][0] == picktwo[1][0]:
                         if picktwo[0][1].can_move:
                             x, y = rules.perform_battle(picktwo[0][1], picktwo[1][1])
                             picktwo[0][1].units -= x
                             picktwo[1][1].units -= y
+                            
                             if picktwo[1][1].units == 0:
                                 world.players[picktwo[1][0]].territories.remove(picktwo[1][1])
                                 world.players[picktwo[0][0]].territories.append(picktwo[1][1])
+
                                 if world.players[picktwo[1][0]].territories == []:
-##                                    dead.append(picktwo[1][0])
                                     world.players[picktwo[1][0]].dead = True
 
                                 if picktwo[1][1].max_units > picktwo[0][1].units - 1:
