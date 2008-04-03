@@ -22,7 +22,8 @@ IndexError: pop from empty list
   * Do not generate territories with less than five squares
   * Zooming needs to center on mouse cursor, or at least put things in the upper left corner with higher resolutions
   * Tile size should grow by default on higher resolutions
-  * Remove players with no territories from the turn list
+  * Remove players with no territories from the turn list -- isn't this already done?
   * Do something to actually end the game when it is over
-  * Map should be centered and not clumped in bottom right corner
+  * Map should be centered and not clumped in bottom right corner - this is due to the world renderer - it is only on the right when zoomed out - partly because every where else is water - this should probably be fixed - but not really a biggie right now.
+  * There seems to be a bug where sometimes the game says a territory is not connected to any other when it really is - or at least it should have been removed if not...
   * More which we have forgotten.. =(
