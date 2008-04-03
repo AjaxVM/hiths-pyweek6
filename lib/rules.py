@@ -17,12 +17,13 @@ def perform_battle(terr1, terr2):
         b += capitol_defense_gain
 
     result = a - b
-    if result <= -10:#critical - terr1 takes total casualties - 1
+    crit = terr1.units + terr2.units / 2
+    if result <= -crit:#critical - terr1 takes total casualties - 1
         return terr1.units - 1, 0
-    if result <= -5:#critical - terr1 takes total casualties, terr2 takes minimal
+    if result <= -int(crit/2):#critical - terr1 takes total casualties, terr2 takes minimal
         return terr1.units - 1, int(terr2.units / 4)
-    if result >= -2 and result <= 2:#equal damage
+    if result >= -int(crit/5) and result <= int(crit/5):#equal damage
         return int(terr1.units / 2), int(terr2.units / 2)
-    if result >= 5:
+    if result >= int(crit/2):
         return int(terr1.units / 4), terr2.units
     return 0, terr2.units
