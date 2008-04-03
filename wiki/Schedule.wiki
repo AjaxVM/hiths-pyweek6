@@ -16,17 +16,18 @@ Tweaked generator, added territories
 Done
 
 =Tuesday=
-Get all the basic game-play except formations done.
+Get all the basic game-play except formations done. -- only basic done!
 
-Start on multiplayer/ai
+Start on multiplayer/ai -- Not DONE!!!
 
 =Wednesday=
-Finish multiplayer, ai
+Basic game-play -- finished
+Finish multiplayer, ai -- not started yet
 
-Begin multiplayer lobby
+Begin multiplayer lobby -- NOPE
 
 =Thursday=
-Overflow for multiplayer/ai
+Overflow for multiplayer/ai -- better hope it only takes today then :P
 
 Testing...
 
@@ -35,7 +36,7 @@ Get final or placeholder images for all the gui/sprites/etc.
 
 Get music/sfx made/in if not already.
 
-Add formations.
+Add formations/captains
 
 =Saturday=
 Finish/all final images/music/sfx
