@@ -98,7 +98,10 @@ def main():
                     keys_down.add(event.key)
 
             if event.type == KEYUP:
-                keys_down.remove(event.key)
+                try: # Ignore any attempts to remove non-existant keys
+                    keys_down.remove(event.key)
+                except KeyError:
+                    continue
 
             if event.type == MOUSEBUTTONDOWN:
                 if event.button == 1:
