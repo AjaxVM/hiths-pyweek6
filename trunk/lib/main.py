@@ -97,14 +97,6 @@ def main():
                 if event.key == K_LEFT or K_RIGHT or K_UP or K_DOWN:
                     keys_down.add(event.key)
 
-#                if event.key == K_LEFT:
-#                    world.offset[0] -= SCROLL_SPEED
-#                if event.key == K_RIGHT:
-#                    world.offset[0] += SCROLL_SPEED
-#                if event.key == K_UP:
-#                    world.offset[1] -= SCROLL_SPEED
-#                if event.key == K_DOWN:
-#                    world.offset[1] += SCROLL_SPEED
             if event.type == KEYUP:
                 keys_down.remove(event.key)
 
@@ -148,10 +140,20 @@ def main():
                           widget_pos="center")
             finish_label.theme.label["text-color"] = world.players[world.one_winner()[1]].color
             finish_label.theme.label["font"] = pygame.font.Font(None, 45)
+
+        for i in picktwo:
+            i[1].highlighted = True
+
+
         #BATTLES!
+        if len(picktwo) == 1:
+            if not picktwo[0][0] == whos_turn:
+                picktwo[0][1].highlighted = False
+                picktwo = []
         if len(picktwo) == 2:
             if picktwo[0][0] == whos_turn:
-                if util.connected_mass(picktwo[0][1].terr, picktwo[1][1].terr):
+                if (not picktwo[0][0] == picktwo[1][0]) and \
+                   util.connected_mass(picktwo[0][1].terr, picktwo[1][1].terr):
                     if not picktwo[0][0] == picktwo[1][0]:
                         if picktwo[0][1].can_move:
                             x, y = rules.perform_battle(picktwo[0][1], picktwo[1][1])
@@ -178,22 +180,26 @@ def main():
                             print "%s cannot move this turn!"%picktwo[0][1]
                     else:
                         print "player territories - moving units"
-                        x = picktwo[0][1].units - 1
-                        if picktwo[1][1].max_units >= picktwo[1][1].units + x:
-                            pass
+                        if picktwo[0][1].can_move:
+                            x = picktwo[0][1].units - 1
+                            if picktwo[1][1].max_units >= picktwo[1][1].units + x:
+                                pass
+                            else:
+                                x = picktwo[1][1].max_units - picktwo[1][1].units
+                            picktwo[0][1].units -= x
+                            picktwo[1][1].units += x
+                            picktwo[0][1].update()
+                            picktwo[1][1].update()
+                            picktwo[1][1].can_move = False
                         else:
-                            x = picktwo[1][1].max_units - picktwo[1][1].units
-                        picktwo[0][1].units -= x
-                        picktwo[1][1].units += x
-                        picktwo[0][1].update()
-                        picktwo[1][1].update()
-                        picktwo[1][1].can_move = False
+                            print "%s cannot move this turn!"%picktwo[0][1]
 
                 else:
                     print "not touching territories"
             else:
                 print "it is player %ss turn!"%whos_turn
-
+            for i in picktwo:
+                i[1].highlighted = False
             picktwo = []
 
         screen.fill((0,0,0))
