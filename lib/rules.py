@@ -1,7 +1,7 @@
 
 capitol_defense_gain = 10
 capitol_troop_gain = 5 #every turn
-supply_troop_gain = 4
+supply_troop_gain = 3
 troop_attack_gain = 3
 troop_defense_gain = 2
 just_troops_gain = 1
