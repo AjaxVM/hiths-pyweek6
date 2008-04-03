@@ -1,0 +1,23 @@
+#summary Here are some bugs we need to squash!
+
+= The Buglist =
+
+Squash 'em if you can:
+  * Random map generation crash, unfortunately a real pain
+{{{
+Traceback (most recent call last):
+  File "run_game.py", line 6, in <module>
+    main.main()
+  File "lib/main.py", line 73, in main
+    make_map_players(world)
+  File "lib/main.py", line 29, in make_map_players
+    new = Player(mg.comp_terrs[0], mg.comp_terrs[0:4], (255, 0, 0))
+  File "lib/world.py", line 122, in __init__
+    i.update()
+  File "lib/world.py", line 108, in update
+    c = x.pop()
+IndexError: pop from empty list
+}}}
+  * Better placement for capitols, preferably next to another friendly territory
+  * Do not generate territories with less than five squares
+  * More which we have forgotten.. =(
