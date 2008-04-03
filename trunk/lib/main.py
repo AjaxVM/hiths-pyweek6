@@ -10,6 +10,9 @@ import random
 
 import time, os
 
+SCROLL_ZONE = 5
+SCROLL_SPEED = 12
+
 def make_map_players(world):
     mg = MapGrid(util.make_random_map())
 
@@ -49,8 +52,10 @@ def make_map_players(world):
 
 def main():
     pygame.init()
-    screen = pygame.display.set_mode((640, 480))
-    world_screen = screen.subsurface((0, 0, 640, 320))
+    screen_size = (640, 480)
+    screen = pygame.display.set_mode(screen_size)
+    world_height = round(screen_size[1]*0.666) # World uses 2/3 of the screen
+    world_screen = screen.subsurface((0, 0, screen_size[0], world_height))
 
     app = gui.App(screen, background_color=None)
     app.theme = gui.make_theme(os.path.join("data", "gui"))
@@ -70,6 +75,8 @@ def main():
     picktwo = []
     whos_turn = 0
 
+    keys_down = set()
+
     while 1:
         for event in app.get_events():
             if event.type == QUIT:
@@ -86,6 +93,20 @@ def main():
                     mg = MapGrid(util.make_random_map())
                     world.grid = mg
                     make_map_players(world)
+
+                if event.key == K_LEFT or K_RIGHT or K_UP or K_DOWN:
+                    keys_down.add(event.key)
+
+#                if event.key == K_LEFT:
+#                    world.offset[0] -= SCROLL_SPEED
+#                if event.key == K_RIGHT:
+#                    world.offset[0] += SCROLL_SPEED
+#                if event.key == K_UP:
+#                    world.offset[1] -= SCROLL_SPEED
+#                if event.key == K_DOWN:
+#                    world.offset[1] += SCROLL_SPEED
+            if event.type == KEYUP:
+                keys_down.remove(event.key)
 
             if event.type == MOUSEBUTTONDOWN:
                 if event.button == 1:
@@ -178,24 +199,26 @@ def main():
         screen.fill((0,0,0))
         world.render()
 
-        x = pygame.mouse.get_pos()
+        mpos = pygame.mouse.get_pos()
 
-        if x[0] <= 5:
-            world.offset[0] -= 4
-        if x[0] >= 635:
-            world.offset[0] += 4
+        if mpos[0] <= SCROLL_ZONE or K_LEFT in keys_down:
+            world.offset[0] -= SCROLL_SPEED
+        if mpos[0] >= screen_size[0] - SCROLL_ZONE or K_RIGHT in keys_down:
+            world.offset[0] += SCROLL_SPEED
 
-        if x[1] <= 5:
-            world.offset[1] -= 4
-        if x[1] >= 475:
-            world.offset[1] += 4
+        if mpos[1] <= SCROLL_ZONE or K_UP in keys_down:
+            world.offset[1] -= SCROLL_SPEED
+        if (mpos[1] >= world_height - SCROLL_ZONE and not mpos[1] > world_height) \
+            or K_DOWN in keys_down:
+            world.offset[1] += SCROLL_SPEED
 
-        pos = world.get_mouse_pos()
-        pygame.draw.rect(screen, (255,255,255),
-                         (pos[0] * world.tile_size[0] - world.offset[0],
-                          pos[1] * world.tile_size[1] - world.offset[1],
-                          world.tile_size[0], world.tile_size[1]),
-                         1)
+        if not mpos[1] > world_height: # Don't draw rect over the interface area
+            pos = world.get_mouse_pos()
+            pygame.draw.rect(screen, (255,255,255),
+                             (pos[0] * world.tile_size[0] - world.offset[0],
+                              pos[1] * world.tile_size[1] - world.offset[1],
+                              world.tile_size[0], world.tile_size[1]),
+                             1)
 
         app.render()
         pygame.display.flip()
