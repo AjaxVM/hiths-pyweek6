@@ -72,6 +72,9 @@ def main():
     world = World(world_screen, map_grid=mg)
     make_map_players(world)
 
+    pygame.mixer.music.load(os.path.join('data','music','slowtheme.ogg'))
+    pygame.mixer.music.play(-1)
+
     picktwo = []
     whos_turn = 0
 
