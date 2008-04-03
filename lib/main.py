@@ -8,7 +8,7 @@ import gui, wui
 
 import random
 
-import time, os
+import time, os, sys
 
 SCROLL_ZONE = 5
 SCROLL_SPEED = 12
@@ -49,7 +49,8 @@ def make_map_players(world):
 
     world.players = players
 
-pygame.mixer.pre_init(44100,-16,2, 1024)
+if sys.platform == "win32":
+    pygame.mixer.pre_init(44100,-16,2, 1024)
 
 def main():
     pygame.init()
