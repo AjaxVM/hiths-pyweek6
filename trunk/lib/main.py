@@ -15,6 +15,12 @@ pygame.mixer.init()
 SCROLL_ZONE = 5
 SCROLL_SPEED = 12
 
+try:
+    import psyco
+    psyco.background()
+except:
+    pass
+
 def make_map_players(world):
     mg = MapGrid(util.make_random_map())
 
@@ -50,11 +56,12 @@ def make_map_players(world):
     players.append(new)
 
     world.players = players
+    world.update()
 
-if sys.platform == "win32":
-    pygame.mixer.pre_init(44100,-16,2, 1024)
-if sys.platform == "linux2":
-    pygame.mixer.pre_init(22050, -32, 2, 2048)
+##if sys.platform == "win32":
+##    pygame.mixer.pre_init(44100,-16,2, 1024)
+##if sys.platform == "linux2":
+##    pygame.mixer.pre_init(44100, -16, 2, 2048)
 
 def main():
     pygame.init()
@@ -86,7 +93,11 @@ def main():
 
     keys_down = set()
 
+    clock = pygame.time.Clock()
+
     while 1:
+        clock.tick(60)
+        print clock.get_fps()
         for event in app.get_events():
             if event.type == QUIT:
                 pygame.quit()
@@ -122,11 +133,13 @@ def main():
                     #zoom in
                     world.tile_size = [world.tile_size[0] * 2,
                                        world.tile_size[1] * 2]
+                    world.update()
                 if event.button == 5:
                     #zoom out
                     if world.tile_size[1] >= 5:
                         world.tile_size = [int(world.tile_size[0] / 2),
                                            int(world.tile_size[1] / 2)]
+                        world.update()
 
             if event.type == gui.GUI_EVENT:
                 if event.widget == gui.Button and event.name == "End Turn":
@@ -138,6 +151,7 @@ def main():
                         whos_turn_label.text = "It is player %ss turn"%(whos_turn+1)
                         whos_turn_label.theme.label["text-color"] = world.players[whos_turn].color
                         whos_turn_label.make_image()
+                        world.update()
 
         if world.players[whos_turn].dead:
             whos_turn += 1
@@ -155,6 +169,7 @@ def main():
 
         for i in picktwo:
             i[1].highlighted = True
+            world.update()
 
 
         #BATTLES!
@@ -177,6 +192,8 @@ def main():
                             if picktwo[1][1].units == 0:
                                 world.players[picktwo[1][0]].territories.remove(picktwo[1][1])
                                 world.players[picktwo[0][0]].territories.append(picktwo[1][1])
+
+                                world.world_image = None #force rerender
 
                                 if world.players[picktwo[1][0]].territories == []:
                                     world.players[picktwo[1][0]].dead = True
@@ -215,6 +232,7 @@ def main():
                 print "it is player %ss turn!"%whos_turn
             for i in picktwo:
                 i[1].highlighted = False
+                world.update()
             picktwo = []
 
         screen.fill((0,0,0))
