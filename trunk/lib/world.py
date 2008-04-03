@@ -93,9 +93,11 @@ class PlayerTerritory(object):
         self.max_units = len(self.terr)
         if self.capitol:
             self.max_units -= 1
+        if self.supply:
+            self.max_units -= 1
         self.actors = []
         x = list(self.terr)
-        random.shuffle(x)
+        #random.shuffle(x)
         if self.capitol:
             c = self.get_middle_tile()
             x.remove(c)
@@ -117,6 +119,14 @@ class Player(object):
         self.start_terr.units = 4
         self.start_terr.capitol = True
         self.territories = all_terr
+
+        # Place a supply center in one of the player's territories
+        while True:
+            index = random.randint(0, len(self.territories)-1)
+            if not self.territories[index].capitol: # Unless there is a capitol
+                self.territories[index].supply = True
+                break
+
         for i in self.territories:
             i.units = 4
             i.update()
