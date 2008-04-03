@@ -49,6 +49,7 @@ def make_map_players(world):
 
     world.players = players
 
+pygame.mixer.pre_init(44100,-16,2, 1024)
 
 def main():
     pygame.init()
