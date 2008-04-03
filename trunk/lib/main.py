@@ -96,7 +96,7 @@ def main():
     clock = pygame.time.Clock()
 
     while 1:
-        clock.tick(60)
+        clock.tick(600)
         print clock.get_fps()
         for event in app.get_events():
             if event.type == QUIT:
