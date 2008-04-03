@@ -165,9 +165,16 @@ class Player(object):
                 largest = len(i)
         return largest
 
+    def has_open_spots(self):
+        for i in self.territories:
+            if i.units < i.max_units:
+                return True
+
     def end_turn(self):
         extra = self.get_terr_holding()
         while extra:
+            if not self.has_open_spots():
+                break
             for i in self.territories:
                 if extra:
                     use = random.randint(0, extra)
