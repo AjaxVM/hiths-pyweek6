@@ -10,6 +10,8 @@ import random
 
 import time, os, sys
 
+pygame.mixer.init()
+
 SCROLL_ZONE = 5
 SCROLL_SPEED = 12
 
