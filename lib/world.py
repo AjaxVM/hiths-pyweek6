@@ -57,6 +57,7 @@ class PlayerTerritory(object):
         self.update()
 
         self.can_move = True
+        self.highlighted = False
 
     def get_middle_tile(self):
         t = None
@@ -128,9 +129,13 @@ class Player(object):
             i.can_move = True
             if i.capitol:
                 i.units += rules.capitol_troop_gain
-                if i.units > i.max_units:
-                    i.units = i.max_units
-                i.update()
+            elif i.supply:
+                i.units += rules.supply_troop_gain
+            else:
+                i.units += rules.just_troops_gain
+            if i.units > i.max_units:
+                i.units = i.max_units
+            i.update()
 
 
 class World(object):
@@ -208,12 +213,16 @@ class World(object):
                          tx, ty)
                     pygame.draw.rect(self.display, x.color, r)
                 for s in i.terr_points: #render borders
+                    if i.highlighted:
+                        amt=4
+                    else:
+                        amt=1
                     pygame.draw.line(self.display, [0,0,0],
                                      [s[0][0]*self.tile_size[0]-self.offset[0],
                                       s[0][1]*self.tile_size[1]-self.offset[1]],
                                      [s[1][0]*self.tile_size[0]-self.offset[0],
                                       s[1][1]*self.tile_size[1]-self.offset[1]],
-                                     1)
+                                     amt)
         for x in self.players:
             for i in x.territories:
                 for s in i.actors:
