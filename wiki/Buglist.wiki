@@ -27,3 +27,4 @@ IndexError: pop from empty list
   * Map should be centered and not clumped in bottom right corner - this is due to the world renderer - it is only on the right when zoomed out - partly because every where else is water - this should probably be fixed - but not really a biggie right now.
   * There seems to be a bug where sometimes the game says a territory is not connected to any other when it really is - or at least it should have been removed if not...
   * More which we have forgotten.. =(
+  * there is a problem with the music playback on different systes that requires different magic numbers to work :(
