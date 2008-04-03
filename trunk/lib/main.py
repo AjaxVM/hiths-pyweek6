@@ -51,6 +51,8 @@ def make_map_players(world):
 
 if sys.platform == "win32":
     pygame.mixer.pre_init(44100,-16,2, 1024)
+if sys.platform == "linux2":
+    pygame.mixer.pre_init(22050, -32, 2, 2048)
 
 def main():
     pygame.init()
