@@ -291,6 +291,8 @@ class World(object):
                                          [s[1][0]*self.tile_size[0],
                                           s[1][1]*self.tile_size[1]],
                                          amt)
+            for x in self.players:
+                for i in x.territories:
                     for s in i.actors:
                         img = self.get_image(s.image)
                         r = img.get_rect()

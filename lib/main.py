@@ -21,7 +21,7 @@ try:
 except:
     pass
 
-def make_map_players(world):
+def make_map_players(world, num_players=2):
     mg = MapGrid(util.make_random_map())
 
     world.grid = mg
@@ -34,28 +34,55 @@ def make_map_players(world):
 ##    p.territories = mg.comp_terrs
 ##    for i in xrange(7):
 ##        new = Player
-    new = Player(mg.comp_terrs[0], mg.comp_terrs[0:4], (255, 0, 0))
-    players.append(new)
+##    new = Player(mg.comp_terrs[0], mg.comp_terrs[0:4], (255, 0, 0))
+##    players.append(new)
+##
+##    new = Player(mg.comp_terrs[4], mg.comp_terrs[4:8], (0, 255, 0))
+##    players.append(new)
+##
+##    new = Player(mg.comp_terrs[8], mg.comp_terrs[8:12], (0, 0, 255))
+##    players.append(new)
+##
+##    new = Player(mg.comp_terrs[12], mg.comp_terrs[12:16], (255, 255, 0))
+##    players.append(new)
+##
+##    new = Player(mg.comp_terrs[16], mg.comp_terrs[16:20], (255, 0, 255))
+##    players.append(new)
+##
+##    new = Player(mg.comp_terrs[20], mg.comp_terrs[20:24], (0, 255, 255))
+##    players.append(new)
+##
+##    new = Player(mg.comp_terrs[24], mg.comp_terrs[24:28], (255, 125, 125))
+##    players.append(new)
+    colors = [(255, 0, 0),
+              (0, 255, 0),
+              (0, 0, 255),
+              (255, 255, 0),
+              (255, 0, 255),
+              (0, 255, 255),
+              (255, 125, 125)]
+    for i in xrange(num_players):
+        new = random.choice(pterr)
+        pterr.remove(new)
+##        p = Player(new, [], colors[i])
+##        players.append(p)
+        players.append([new, [new], colors[i]])
 
-    new = Player(mg.comp_terrs[4], mg.comp_terrs[4:8], (0, 255, 0))
-    players.append(new)
+    
 
-    new = Player(mg.comp_terrs[8], mg.comp_terrs[8:12], (0, 0, 255))
-    players.append(new)
+    while pterr:
+        for i in players:
+            if pterr:
+                new = random.choice(pterr)
+                pterr.remove(new)
+                i[1].append(new)
 
-    new = Player(mg.comp_terrs[12], mg.comp_terrs[12:16], (255, 255, 0))
-    players.append(new)
+    ret = []
+    for i in players:
+        ret.append(Player(i[0], i[1], i[2]))
+        
 
-    new = Player(mg.comp_terrs[16], mg.comp_terrs[16:20], (255, 0, 255))
-    players.append(new)
-
-    new = Player(mg.comp_terrs[20], mg.comp_terrs[20:24], (0, 255, 255))
-    players.append(new)
-
-    new = Player(mg.comp_terrs[24], mg.comp_terrs[24:28], (255, 125, 125))
-    players.append(new)
-
-    world.players = players
+    world.players = ret
     world.update()
 
 ##if sys.platform == "win32":
