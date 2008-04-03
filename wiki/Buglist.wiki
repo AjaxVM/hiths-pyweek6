@@ -19,7 +19,7 @@ Traceback (most recent call last):
 IndexError: pop from empty list
 }}}
   * Better placement for capitols, preferably next to another friendly territory
-  * Do not generate territories with less than five squares
+  * Do not generate territories with less than five squares -- this is the bug the above traceback is for.
   * Zooming needs to center on mouse cursor, or at least put things in the upper left corner with higher resolutions
   * Tile size should grow by default on higher resolutions
   * Remove players with no territories from the turn list -- isn't this already done?
