@@ -220,6 +220,8 @@ class World(object):
 
         self.players = []
 
+        self.world_image = None
+
     def one_winner(self):
         good=0
         best = None
@@ -249,7 +251,7 @@ class World(object):
         return self.__images[name]
 
     def render(self):
-        if self.map_size == ():
+        if self.map_size == () or self.world_image == None:
             x, y = self.grid.get_dimensions()
             x *= self.tile_size[0]
             y *= self.tile_size[1]
@@ -269,30 +271,33 @@ class World(object):
 
         self.display.fill((255,255,255))
 
-        for x in self.players:
-            for i in x.territories:
-                for s in i.terr: #render territories
-                    r = (s[0] * tx - dx, s[1] * ty - dy,
-                         tx, ty)
-                    pygame.draw.rect(self.display, x.color, r)
-                for s in i.terr_points: #render borders
-                    if i.highlighted:
-                        amt=4
-                    else:
-                        amt=1
-                    pygame.draw.line(self.display, [0,0,0],
-                                     [s[0][0]*self.tile_size[0]-self.offset[0],
-                                      s[0][1]*self.tile_size[1]-self.offset[1]],
-                                     [s[1][0]*self.tile_size[0]-self.offset[0],
-                                      s[1][1]*self.tile_size[1]-self.offset[1]],
-                                     amt)
-        for x in self.players:
-            for i in x.territories:
-                for s in i.actors:
-                    img = self.get_image(s.image)
-                    r = img.get_rect()
-                    r.bottomleft = (s.pos[0] * tx - dx, (s.pos[1]+1) * ty - dy)
-                    self.display.blit(img, r.topleft)
+        if not self.world_image:
+            self.world_image = pygame.Surface(self.map_size)
+            self.world_image.fill((255,255,255))
+            for x in self.players:
+                for i in x.territories:
+                    for s in i.terr: #render territories
+                        r = (s[0] * tx, s[1] * ty,
+                             tx, ty)
+                        pygame.draw.rect(self.world_image, x.color, r)
+                    for s in i.terr_points: #render borders
+                        if i.highlighted:
+                            amt=4
+                        else:
+                            amt=1
+                        pygame.draw.line(self.world_image, [0,0,0],
+                                         [s[0][0]*self.tile_size[0],
+                                          s[0][1]*self.tile_size[1]],
+                                         [s[1][0]*self.tile_size[0],
+                                          s[1][1]*self.tile_size[1]],
+                                         amt)
+                    for s in i.actors:
+                        img = self.get_image(s.image)
+                        r = img.get_rect()
+                        r.bottomleft = (s.pos[0] * tx, (s.pos[1]+1) * ty)
+                        self.world_image.blit(img, r.topleft) 
+
+        self.display.blit(self.world_image, (-dx, -dy))
 
     def get_mouse_pos(self):
         p = pygame.mouse.get_pos()
@@ -312,6 +317,9 @@ class World(object):
                 if x in j.terr:
                     return self.players.index(i), j
         return None
+
+    def update(self):
+        self.world_image = None
             
 
         
