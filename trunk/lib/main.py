@@ -107,6 +107,11 @@ def main():
     whos_turn_label.theme.label["text-color"] = [255,0,0]
     whos_turn_label.make_image()
 
+    fps_label = gui.Label(app, (0, screen_size[1]), "FPS Label", "FPS: ",
+                          widget_pos="bottomleft")
+    fps_label.theme.label["text-color"] = [255,0,0]
+    fps_label.make_image()
+
     mg = MapGrid(util.make_random_map())
 
     world = World(world_screen, map_grid=mg)
@@ -124,7 +129,10 @@ def main():
 
     while 1:
         clock.tick(600)
-        print clock.get_fps()
+        if not pygame.time.get_ticks() % 10:
+            fps_label.text = "FPS: %i" % clock.get_fps()
+            fps_label.make_image()
+
         for event in app.get_events():
             if event.type == QUIT:
                 pygame.quit()
@@ -195,8 +203,9 @@ def main():
             finish_label.theme.label["font"] = pygame.font.Font(None, 45)
 
         for i in picktwo:
-            i[1].highlighted = True
-            world.update()
+            if not i[1].highlighted: # Don't force a re-render if already highlighted
+                i[1].highlighted = True
+                world.update()
 
 
         #BATTLES!
