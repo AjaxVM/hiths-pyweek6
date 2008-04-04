@@ -109,6 +109,7 @@ class Server(object):
                 else:
                     data=recvPacket(sockobj)
                     if data=="BAD_SOCK":
+                        self.handler.handle(["LOST_USER", sockobj])
                         sockobj.close()
                         self.read_socks.remove(sockobj)
                     else:
