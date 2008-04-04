@@ -1,5 +1,45 @@
 import net, socket
 
+class Game(object):
+    def __init__(self, name, start_player, num_players):
+        self.name = name
+        self.whos_turn = 0
+
+        self.num_players = num_players
+        self.make_user_numbers()
+
+        self.users = {start_player.name:start_player}
+
+        self.make_map()
+
+    def make_user_numbers(self):
+        self.player_nums = range(self.num_players)
+        random.shuffle(self.player_nums)
+
+    def replace_user_with_ai(self, user):
+        del self.users[user] #should really be changed to AI!!!!
+
+    def get_player_num(self, user):
+        cur = 0
+        for i in self.users:
+            if self.users[i] == user:
+                return cur
+            cur += 1
+        return None
+
+    def make_map(self):
+        self.mapdata = None#this should be generated like main.py currently does
+        self.players = None#as should this
+
+class User(object):
+    def __init__(self, name, sockobj):
+        self.name = name
+        self.sockobj = sockobj
+
+        self.messages = []
+        self.ingame = False
+        self.ignore = []
+
 class Client(object):
     def __init__(self, username=""):
         self.username = username
@@ -41,7 +81,7 @@ class Client(object):
         net.request(self.server, net.Packet(["UPDATE_WORLD", self.gamename,
                                              self.username,
                                              terr1, terr2,
-                                             t1_troops, t2_troop, conquer]))
+                                             t1_troops, t2_troops, conquer]))
 
     def get_messages(self):
         return net.request(self.server, net.Packet(["GET_MESSAGES", self.gamename, self.username])).data
@@ -70,6 +110,7 @@ class Client(object):
         a = net.request(self.server, net.Packet(["JOIN_GAME", gamename, self.username])).data
         if a == "REJECT":
             return False
+        self.gamename = gamename
         return True
 
     def get_player_number(self):
@@ -78,7 +119,7 @@ class Client(object):
         return a
 
     def begin_game(self):
-        a = net.request(self.server, net.Packet(["START_GAME", gamename, self.username])).data
+        a = net.request(self.server, net.Packet(["START_GAME", self.gamename, self.username])).data
         if a == "BAD_GAME":
             return False
         return True
@@ -93,3 +134,6 @@ class Client(object):
         if self.gamename=="lobby":
             return net.request(self.server, net.Packet(["GET_GAMES", 0])).data
         return self.gamename
+
+    def add_ai_player(self):
+        net.request(self.server, net.Packet(["ADD_AI", self.gamename, self.username]))
