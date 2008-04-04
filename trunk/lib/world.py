@@ -19,13 +19,12 @@ def sort_actors(x, y):
     return 0
 
 class Actor(object):
-    def __init__(self, image, pos = (0, 0)):
+    def __init__(self, image, pos = (0, 0), type="robot"):
         """image is the filename of the image - not the surface! - that way you can simply transfer
            the images stored in world through a network quicker..."""
         self.image = image
-
+        self.type = type
         self.pos = pos
-
 
 class MapGrid(object):
     def __init__(self, #images={"n":None},
@@ -48,16 +47,29 @@ class PlayerTerritory(object):
         self.terr_points = util.get_points(self.terr)
 
         self.units = units
-
         self.max_units = len(self.terr)
 
         self.capitol = False
         self.supply = False
 
+        self.actors = []
+
         self.update()
 
         self.can_move = True
         self.highlighted = False
+
+    def set_capitol(self):
+        self.capitol = True
+        self.max_units -= 1
+        c = self.get_middle_tile()
+        self.actors.append(Actor(os.path.join("data", "images", "capitol1.png"), c, "capitol"))
+
+    def set_supply(self):
+        self.supply = True
+        self.max_units -= 1
+        c = self.get_middle_tile()
+        self.actors.append(Actor(os.path.join("data", "images", "supply1.png"), c, "supply"))
 
     def get_middle_tile(self):
         t = None
@@ -90,41 +102,63 @@ class PlayerTerritory(object):
         return closest
 
     def update(self):
-        self.max_units = len(self.terr)
-        if self.capitol:
-            self.max_units -= 1
-        if self.supply:
-            self.max_units -= 1
-        self.actors = []
-        x = list(self.terr)
-        #random.shuffle(x)
-        if self.capitol:
-            c = self.get_middle_tile()
-            x.remove(c)
-            self.actors.append(Actor(os.path.join("data", "images", "capitol1.png"), c))
-        if self.supply:
-            c = self.get_middle_tile()
-            x.remove(c)
-            self.actors.append(Actor(os.path.join("data", "images", "supply1.png"), c))
-        for i in xrange(self.units):
-            c = x.pop()
-            self.actors.append(Actor(os.path.join("data", "images", "robo1.png"), c))
+        """Update the units in the territory."""
+        # Get the change in units between what is displayed and what we actually have
+        unit_count = self.units - len(self.actors)
+        if self.supply or self.capitol: # Adjust for supply or capitol
+            unit_count += 1
+
+        # Add more units?
+        if unit_count > 0:
+            empty_tiles = self._get_empty_tiles()
+            random.shuffle(empty_tiles)
+
+            for i in xrange(unit_count):
+                c = empty_tiles.pop()
+                self.actors.append(Actor(os.path.join("data", "images", "robo1.png"), c))
+        # Are some units dead?
+        elif unit_count < 0:
+            # Make sure we aren't marking the capitol or supply dead
+            all_are_bots = False
+            while not all_are_bots:
+                death_list = random.sample(self.actors, unit_count * -1)
+                all_are_bots = True
+                for i in death_list:
+                    if i.type != "robot":
+                        all_are_bots = False
+
+            for i in death_list:
+                self.actors.remove(i)
 
         self.actors.sort(sort_actors)
+
+    def _get_empty_tiles(self):
+        """Returns a list of tiles without an Actor in them"""
+        occupied_tiles = []
+        terr = list(self.terr)
+
+        for i in self.actors:
+            occupied_tiles.append(i.pos)
+
+        for i in occupied_tiles:
+            if i in terr:
+                terr.remove(i)
+
+        return terr # All tiles without an actor
 
 class Player(object):
     def __init__(self, start_terr=None, all_terr=[], color=(255, 255, 0)):
         self.start_terr = start_terr
         self.start_terr.player = self
         self.start_terr.units = 4
-        self.start_terr.capitol = True
+        self.start_terr.set_capitol()
         self.territories = all_terr
 
         # Place a supply center in one of the player's territories
         while True:
             index = random.randint(0, len(self.territories)-1)
             if not self.territories[index].capitol: # Unless there is a capitol
-                self.territories[index].supply = True
+                self.territories[index].set_supply()
                 break
 
         for i in self.territories:
