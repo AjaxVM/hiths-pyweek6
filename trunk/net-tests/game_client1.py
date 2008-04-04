@@ -137,3 +137,8 @@ class Client(object):
 
     def add_ai_player(self):
         net.request(self.server, net.Packet(["ADD_AI", self.gamename, self.username]))
+
+    def make_map(self):
+        #generate map and player stuff here!
+        mapdata, playerdata = [], []
+        net.request(self.server, net.Packet(["MAKE_MAP", self.gamename, self.username, mapdata, playerdata]))

@@ -29,9 +29,9 @@ class Game(object):
             cur += 1
         return None
 
-    def make_map(self):
-        self.mapdata = None#this should be generated like main.py currently does
-        self.players = None#as should this
+    def make_map(self, md, pd):
+        self.mapdata = md
+        self.players = pd
 
     def add_ai(self):
         self.num_ai += 1
@@ -57,6 +57,7 @@ class my_handler(net.DefaultHandler):
                       "END_TURN":self.handleEND_TURN,
                       "NEW_GAME":self.handleNEW_GAME,
                       "GET_MAP":self.handleGET_MAP,
+                      "MAKE_MAP":self.handleMAKE_MAP,
                       "UPDATE_WORLD":self.handleUPDATE_WORLD,
                       "GET_WHOS_TURN":self.handleGET_WHOS_TURN,
                       "START_GAME":self.handleSTART_GAME,
@@ -210,6 +211,14 @@ class my_handler(net.DefaultHandler):
         game = data[0]
         user = data[1]
         self.games[game].add_ai()
+        return net.Packet("")
+
+    def handleMAKE_MAP(self, data):
+        game = data[0]
+        user = data[1]
+        md = data[2]
+        pd = data[3]
+        self.games[game].makemap(md, pd)
         return net.Packet("")
 
 def Serve():
