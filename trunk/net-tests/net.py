@@ -8,7 +8,7 @@ def recvPacket(sock):
     while 1:
         try:d = d + sock.recv(1024)
         except:
-            return "BAD_SOCK"
+            return Packet("BAD_SOCK", False)
         if d[len(d)-3:len(d)]=="END":
             break
     d=Packet(d[0:len(d)-3], False)
@@ -23,7 +23,7 @@ def sendPacket(sock, data):
 
 def request(sock, data):
     if sendPacket(sock, data)=="BAD_SOCK":
-        return "BAD_SOCK"
+        return Packet("BAD_SOCK", False)
     return recvPacket(sock)
 
 class Packet(object):
@@ -109,7 +109,7 @@ class Server(object):
                 else:
                     data=recvPacket(sockobj)
                     if data=="BAD_SOCK":
-                        self.handler.handle(["LOST_USER", sockobj])
+                        self.handler.handle(["LOST_USER", str(sockobj.getsockname())])
                         sockobj.close()
                         self.read_socks.remove(sockobj)
                     else:

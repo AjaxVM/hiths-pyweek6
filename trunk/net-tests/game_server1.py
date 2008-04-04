@@ -14,7 +14,7 @@ class Game(object):
         self.make_map()
 
     def make_user_numbers(self):
-        self.player_nums = range(num_players)
+        self.player_nums = range(self.num_players)
         random.shuffle(self.player_nums)
 
     def replace_user_with_ai(self, user):
@@ -61,8 +61,8 @@ class my_handler(net.DefaultHandler):
                       "CHANGE_NUM_PLAYERS":self.handleCHANGE_NUM_PLAYERS,
                       "GET_PLAYERS":self.handleGET_PLAYERS,
                       "LOST_USER":self.handleLOST_USER,
-                      "REMOVE_USER":self.handleREMOVE_USER,
-                      "IGNORE_USER":self.handleIGNORE}
+                      "IGNORE_USER":self.handleIGNORE,
+                      "GET_GAMES":self.handleGET_GAMES}
 
         self.games = {}
 
@@ -93,7 +93,10 @@ class my_handler(net.DefaultHandler):
     def handleGET_MESSAGES(self, data):
         game = data[0]
         del data[0]
-        sending = list(self.games[game].users[data[0]].messages)
+        if game == "lobby":
+            sending = self.users[data[0]].messages
+        else:
+            sending = self.games[game].users[data[0]].messages
         self.users[data[0]].messages=[]
         return net.Packet(sending)
         pass
@@ -113,7 +116,7 @@ class my_handler(net.DefaultHandler):
         players = data[2]
         if game in self.games:
             return net.Packet("BAD GAME NAME")
-        self.games[game] = Game(game, user, players)
+        self.games[game] = Game(game, self.users[user], players)
         return net.Packet("")
 
     def handleGET_MAP(self, data):
@@ -157,7 +160,7 @@ class my_handler(net.DefaultHandler):
         self.games[game].users[user.name] = user
         return net.Packet("")
 
-    def handeGET_USER_NUMBER(self, data):
+    def handleGET_USER_NUMBER(self, data):
         game = data[0]
         user = data[1]
         return net.Packet(self.games[game].get_player_num(user))
@@ -180,7 +183,7 @@ class my_handler(net.DefaultHandler):
         for i in self.users:
             if self.users[i].sockobj == data[0]:
                 self.handleMESSAGE(["!SERVER->everyone!", "LOST_USER", self.users[i]])
-                del self.users[i]]
+                del self.users[i]
         for i in self.games:
             i = self.games[i]
             for x in i.users:
@@ -193,6 +196,9 @@ class my_handler(net.DefaultHandler):
         ig = data[1]
         self.users[user].ignore.append(ig)
         return net.Packet("")
+
+    def handleGET_GAMES(self, data):
+        return net.Packet(self.games)
 
 a = net.Server("",12345, handler=my_handler)
 a.connect()
