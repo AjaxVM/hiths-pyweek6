@@ -1,4 +1,5 @@
 import net, socket
+import random
 
 class Client(object):
     def __init__(self, username=""):
@@ -21,11 +22,15 @@ class Client(object):
         if a == "REGECT":
             #we've been rejected -- to many users!!!
             print "too many users connected to main server - please come back later"
+            raise SystemExit()
+##            return False
         else:
             a = net.request(self.server, ["USER_NAME", self.username]).data
             if a == "BAD USER NAME":
                 #prompt user to pick a new username
                 self.bad_username = True
+##                return False
+##            return True
 
     def is_my_turn(self):
         return net.request(self.server, net.Packet(["GET_WHOS_TURN", self.game_name])).data == self.my_player
@@ -44,13 +49,40 @@ class Client(object):
     def send_message(self, message):
         net.request(self.server, net.Packet(["MESSAGE", self.game_name, message]))
 
-    def start_new_game(self, gamename):
-        a = net.requet(self.server, net.Packet(["NEW_GAME", gamename, self.username]))
+    def start_new_game(self, gamename, num_players):
+        a = net.requet(self.server, net.Packet(["NEW_GAME", gamename, num_players, self.username]))
         if a == "BAD GAME NAME":
-            return "NEW NAME"
+            return False
 
         self.game_name = gamename
-        return "GOOD NAME"
+        return True
+
+    def shuffle_players(self):
+        a = net.request(self.server, net.Packet(["GET_NUM_PLAYERS", self.gamename])).data
+        cur = []
+        for i in xrange(a):
+            cur.append(i)
+
+        random.shuffle(cur)
+        return cur
+
+    def join_game(self, gamename): #join a pre-existing game
+        a = net.request(self.server, net.Packet(["JOIN_GAME", gamename, self.username])).data
+        if a == "REJECT":
+            return False
+        return True
+
+    def get_player_number(self):
+        return net.request(self.server, net.Packet["GET_USER_NUMBER", self.gamename, self.username])).data
+
+    def begin_game(self):
+        a = net.request(self.server, net.Packet(["START_GAME", gamename, self.username])).data
+        if a == "BAD_GAME":
+            return False
+        return True
 
     def make_map(self, mapgrid, players):
         net.request(self.server, net.Packet(["NEW_MAP", self.game_name, self.username, mapgrid, players]))
+
+    def change_num_players(self, num):
+        net.request(self.server, net.Packet(["CHANGE_NUM_PLAYERS", self.gamename, self.username, num]))
