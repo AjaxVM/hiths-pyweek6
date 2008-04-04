@@ -1,63 +1,16 @@
-import socket, thread, sys
-import net
-
-
-##host = "localhost"
-##port = 12345
-##s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-##s.connect((host, port))
-##
-##a = net.recvPacket(s).data
-##print a
-
-global finished
-finished=False
-def send(s, user_name):
-    global finished
-    while 1:
-        #send message
-        d=raw_input("")
-        if not finished:
-            net.request(s, net.Packet(["MESSAGE",user_name,d]))
-        else:
-            return
-
-
-def recv(s, user_name):
-    global finished
-    while 1:
-        #get messages...
-        pckt = net.request(s, net.Packet(["GET_MESSAGES",user_name]))
-        if pckt=="BAD_SOCK":
-            print "##Server Connection Lost!##\npress any key to continue"
-            finished=True
-            raise SystemExit()
-            return
-        for i in pckt.data:
-            if not i[0]==user_name:
-                print "\t"+i[0]+": "+i[1]
+from game_client1 import *
 
 
 def main():
-    host="localhost"
-    port=12345
-    s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((host, port))
+    a = Client("testy")
 
-    #see if we were accepted or not...
-    a=net.recvPacket(s).data
+    a.send_message("Hello World!") #to lobby
+    print a.get_messages() #from lobby only right now
 
-    user_name=raw_input('user_name: ')
-    net.request(s, net.Packet(["USER_JOIN", user_name]))
-    
-    thread.start_new(recv, (s,user_name))
-    global finished
-    while not finished:
-        if a=="REGECT":
-            return
+    print a.get_games()
 
-        send(s, user_name)
-    return
+    print a.start_new_game("test#1", 5)
+
+    print a.get_games()
 
 main()
-
