@@ -10,6 +10,7 @@ class Game(object):
         self.make_user_numbers()
 
         self.users = {start_player.name:start_player}
+        self.num_ai = 0
 
         self.make_map()
 
@@ -23,7 +24,7 @@ class Game(object):
     def get_player_num(self, user):
         cur = 0
         for i in self.users:
-            if self.users[i] == user:
+            if i == user:
                 return cur
             cur += 1
         return None
@@ -31,6 +32,10 @@ class Game(object):
     def make_map(self):
         self.mapdata = None#this should be generated like main.py currently does
         self.players = None#as should this
+
+    def add_ai(self):
+        self.num_ai += 1
+        self.users["AI%s"%self.num_ai] = User("AI%s"%self.num_ai, None)
 
 class User(object):
     def __init__(self, name, sockobj):
@@ -62,7 +67,8 @@ class my_handler(net.DefaultHandler):
                       "GET_PLAYERS":self.handleGET_PLAYERS,
                       "LOST_USER":self.handleLOST_USER,
                       "IGNORE_USER":self.handleIGNORE,
-                      "GET_GAMES":self.handleGET_GAMES}
+                      "GET_GAMES":self.handleGET_GAMES,
+                      "ADD_AI":self.handleADD_AI}
 
         self.games = {}
 
@@ -157,7 +163,7 @@ class my_handler(net.DefaultHandler):
     def handleJOIN_GAME(self, data):
         game = data[0]
         user = data[1]
-        self.games[game].users[user.name] = user
+        self.games[game].users[user] = self.users[user]
         return net.Packet("")
 
     def handleGET_USER_NUMBER(self, data):
@@ -199,6 +205,12 @@ class my_handler(net.DefaultHandler):
 
     def handleGET_GAMES(self, data):
         return net.Packet(self.games)
+
+    def handleADD_AI(self, data):
+        game = data[0]
+        user = data[1]
+        self.games[game].add_ai()
+        return net.Packet("")
 
 a = net.Server("",12345, handler=my_handler)
 a.connect()
