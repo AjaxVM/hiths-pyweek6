@@ -18,7 +18,12 @@ class my_handler(net.DefaultHandler):
                       "NEW_MAP":self.handleNEW_MAP,
                       "UPDATE_WORLD":self.handleUPDATE_WORLD,
                       "MAKE_PLAYERS":self.handleMAKE_PLAYERS,
-                      "GET_WHOS_TURN":self.handleGET_WHOS_TURN}
+                      "GET_WHOS_TURN":self.handleGET_WHOS_TURN,
+                      "START_GAME":self.handleSTART_GAME,
+                      "GET_NUM_PLAYERS":self.handleGET_NUM_PLAYERS,
+                      "JOIN_GAME":self.handleJOIN_GAME,
+                      "GET_USER_NUMBER":self.handleGET_USER_NUMBER,
+                      "CHANGE_NUM_PLAYERS":self.handleCHANGE_NUM_PLAYERS}
 
         self.games = {}
 
@@ -58,6 +63,21 @@ class my_handler(net.DefaultHandler):
         pass
 
     def handleGET_WHOS_TURN(self, data):
+        pass
+
+    def handleSTART_GAME(self, data):
+        pass
+
+    def handleGET_NUM_PLAYERS(self, data):
+        pass
+
+    def handleJOIN_GAME(self, data):
+        pass
+
+    def handeGET_USER_NUMBER(self, data):
+        pass
+
+    def handleCHANGE_NUM_PLAYERS(self, data):
         pass
 
 a = net.Server("",12345, handler=my_handler)
