@@ -29,14 +29,16 @@ Begin multiplayer lobby -- NOPE
 =Thursday=
 Overflow for multiplayer/ai -- better hope it only takes today then :P
 
-Testing...
+DONE -- hope it works ;)
+
+Needs to be implemented still.
 
 =Friday=
 Get final or placeholder images for all the gui/sprites/etc.
 
 Get music/sfx made/in if not already.
 
-Add formations/captains
+Add formations/captains -- no longer going to do unless we have loads of time Sat.
 
 =Saturday=
 Finish/all final images/music/sfx
