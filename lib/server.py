@@ -212,6 +212,7 @@ class my_handler(net.DefaultHandler):
         self.games[game].add_ai()
         return net.Packet("")
 
-a = net.Server("",12345, handler=my_handler)
-a.connect()
-a.serve()
+def Serve():
+    a = net.Server("",12345, handler=my_handler)
+    a.connect()
+    a.serve()
