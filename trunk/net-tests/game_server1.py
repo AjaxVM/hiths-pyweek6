@@ -11,6 +11,8 @@ class Game(object):
 
         self.users = {start_player.name:start_player}
 
+        self.make_map()
+
     def make_user_numbers(self):
         self.player_nums = range(num_players)
         random.shuffle(self.player_nums)
@@ -25,6 +27,10 @@ class Game(object):
                 return cur
             cur += 1
         return None
+
+    def make_map(self):
+        self.mapdata = None#this should be generated like main.py currently does
+        self.players = None#as should this
 
 class User(object):
     def __init__(self, name, sockobj):
@@ -45,9 +51,8 @@ class my_handler(net.DefaultHandler):
                       "GET_MESSAGES":self.handleGET_MESSAGES,
                       "END_TURN":self.handleEND_TURN,
                       "NEW_GAME":self.handleNEW_GAME,
-                      "NEW_MAP":self.handleNEW_MAP,
+                      "GET_MAP":self.handleGET_MAP,
                       "UPDATE_WORLD":self.handleUPDATE_WORLD,
-                      "MAKE_PLAYERS":self.handleMAKE_PLAYERS,
                       "GET_WHOS_TURN":self.handleGET_WHOS_TURN,
                       "START_GAME":self.handleSTART_GAME,
                       "GET_NUM_PLAYERS":self.handleGET_NUM_PLAYERS,
@@ -74,15 +79,15 @@ class my_handler(net.DefaultHandler):
             for i in self.users:
                 i = self.users[i]
                 if not i.ingame or data[0] in i.ignore:
-                    i.messages.append(data)
-        elif game == "!SERVEReveryone!@@":
+                    i.messages.append(["MESSAGE", data])
+        elif game == "!SERVER->everyone!@@":
             for i in self.users:
                 self.users[i].messages.append(data)
         else:
             for i in self.games[game].users:
                 i = self.games[game].users[i]
                 if not data[0] in i.ignore:
-                    i.messages.append(data)
+                    i.messages.append(["MESSAGE", data])
         return net.Packet("")
 
     def handleGET_MESSAGES(self, data):
@@ -111,41 +116,70 @@ class my_handler(net.DefaultHandler):
         self.games[game] = Game(game, user, players)
         return net.Packet("")
 
-    def handleNEW_MAP(self, data):
-        pass
+    def handleGET_MAP(self, data):
+        game = data[0]
+        user = data[1]
+        game = self.games[game]
+        return net.Packet([game.mapdata, game.players])
 
     def handleUPDATE_WORLD(self, data):
-        pass
-
-    def handleMAKE_PLAYERS(self, data):
-        pass
+        game = data[0]
+        user = data[1]
+        terr1 = data[2]
+        terr2 = data[3]
+        t1_troops = data[4]
+        t2_troops = data[5]
+        conquer = data[6]
+        for i in self.games[game].users:
+            i = self.games[game].users[i]
+            i.messages.append(["UPDATE_WORLD", terr1, terr2, t1_troops, t2_troops, conquer])
+        return net.Packet("")
 
     def handleGET_WHOS_TURN(self, data):
-        pass
+        game = data[0]
+        return net.Packet(self.games[game].whos_turn)
 
     def handleSTART_GAME(self, data):
-        pass
+        game = data[0]
+        user = data[1]
+        for i in self.games[game].users:
+            i = self.games[game].users[i]
+            i.messages.append(["START_GAME"])
+        return net.Packet("")
 
     def handleGET_NUM_PLAYERS(self, data):
-        pass
+        game = data[0]
+        return net.Packet(len(self.games[game].users))
 
     def handleJOIN_GAME(self, data):
-        pass
+        game = data[0]
+        user = data[1]
+        self.games[game].users[user.name] = user
+        return net.Packet("")
 
     def handeGET_USER_NUMBER(self, data):
-        pass
+        game = data[0]
+        user = data[1]
+        return net.Packet(self.games[game].get_player_num(user))
 
     def handleCHANGE_NUM_PLAYERS(self, data):
-        pass
+        #also remake games mapdata
+        game = data[0]
+        user = data[1]
+        num = data[2]
+        self.games[game].num_players = num
+        self.games[game].make_map()
+        return net.Packet("")
 
     def handleGET_PLAYERS(self, data):
-        pass
+        game = data[0]
+        return net.Packet(list(self.games[game].users))
 
     def handleLOST_USER(self, data):
         user = ""
         for i in self.users:
             if self.users[i].sockobj == data[0]:
-                self.handleMESSAGE(["!SERVEReveryone!@@", "LOST_USER", self.users[i]])
+                self.handleMESSAGE(["!SERVER->everyone!", "LOST_USER", self.users[i]])
                 del self.users[i]]
         for i in self.games:
             i = self.games[i]

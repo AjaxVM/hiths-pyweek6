@@ -4,7 +4,7 @@ class Client(object):
     def __init__(self, username=""):
         self.username = username
         self.bad_username = False
-        self.game_name = "lobby"
+        self.gamename = "lobby"
 
         self.server = None #this will be the main server eventually
         self.port = 12345
@@ -30,16 +30,16 @@ class Client(object):
 
     def is_my_turn(self):
         return net.request(self.server, net.Packet(["GET_WHOS_TURN",
-                                                    self.game_name,
+                                                    self.gamename,
                                                     self.username])).data == self.my_player
 
     def get_who_turn(self):
         return net.request(self.server, net.Packet(["GET_WHOS_TURN",
-                                                    self.game_name,
+                                                    self.gamename,
                                                     self.username])).data
 
     def update_world(self, terr1, terr2, t1_troops, t2_troops, conquer=False):
-        net.request(self.server, net.Packet(["UPDATE_WORLD", self.game_name,
+        net.request(self.server, net.Packet(["UPDATE_WORLD", self.gamename,
                                              self.username,
                                              terr1, terr2,
                                              t1_troops, t2_troop, conquer]))
@@ -48,14 +48,14 @@ class Client(object):
         return net.request(self.server, net.Packet(["GET_MESSAGES", self.username])).data
 
     def send_message(self, message):
-        net.request(self.server, net.Packet(["MESSAGE", self.game_name, self.username, message]))
+        net.request(self.server, net.Packet(["MESSAGE", self.gamename, self.username, message]))
 
     def start_new_game(self, gamename, num_players):
         a = net.requet(self.server, net.Packet(["NEW_GAME", gamename, self.username, num_players]))
         if a == "BAD GAME NAME":
             return False
 
-        self.game_name = gamename
+        self.gamename = gamename
         return True
 
     def end_turn(self):
@@ -74,7 +74,9 @@ class Client(object):
         return True
 
     def get_player_number(self):
-        return net.request(self.server, net.Packet["GET_USER_NUMBER", self.gamename, self.username])).data
+        a = net.request(self.server, net.Packet["GET_USER_NUMBER", self.gamename, self.username])).data
+        self.my_player = a
+        return a
 
     def begin_game(self):
         a = net.request(self.server, net.Packet(["START_GAME", gamename, self.username])).data
@@ -82,8 +84,11 @@ class Client(object):
             return False
         return True
 
-    def make_map(self, mapgrid, players):
-        net.request(self.server, net.Packet(["NEW_MAP", self.game_name, self.username, mapgrid, players]))
+##    def make_map(self, mapgrid, players):
+##        net.request(self.server, net.Packet(["NEW_MAP", self.game_name, self.username, mapgrid, players]))
+
+    def get_map(self):
+        return net.request(self.server, net.Packet(["GET_MAP", self.gamename, self.username])).data
 
     def change_num_players(self, num):
         net.request(self.server, net.Packet(["CHANGE_NUM_PLAYERS", self.gamename, self.username, num]))
