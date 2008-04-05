@@ -189,6 +189,13 @@ def game(screen, myConfig, nump, numai):
                     pygame.image.save(screen, os.path.join("data", "screenshots",
                                                            "screenie %s.jpg"%a))
 
+                if event.key == K_ESCAPE:
+                    a = wui.escape_screen(screen, myConfig)
+                    if a == "QUIT" or a == "LEAVE":
+                        return a
+                    else:
+                        pass#we returned to game!
+
                 if event.key == K_LEFT or K_RIGHT or K_UP or K_DOWN:
                     keys_down.add(event.key)
 
@@ -499,6 +506,10 @@ def main():
                 pygame.quit()
                 return
             goto = "MainMenu"
+            if myConfig.music:
+                pygame.mixer.music.load(os.path.join('data','music','fasttheme.ogg'))
+                pygame.mixer.music.play(-1)
+                pygame.mixer.music.set_volume(myConfig.sound_volume*0.01)
         if goto == "Options":
             a = wui.Options(screen, myConfig)
             if a == "QUIT":

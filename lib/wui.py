@@ -522,3 +522,45 @@ def map_loading(screen):
 
     screen.blit(app.render(), (0,0))
     pygame.display.flip()
+
+def escape_screen(screen, myConfig):
+    bg = screen.copy()
+    app = gui.App(pygame.Surface(screen.get_size()).convert_alpha(), background_color=(0,0,0,0))
+    app.theme = gui.make_theme(os.path.join("data", "gui"))
+
+    main_win = gui.Window(app, (-1, -1), "Menu", "center", [350,200],
+                          caption="Menu")
+
+    play_game = gui.Button(main_win, (-1, -1), "RETURN", "Return to game.",
+                           widget_pos="midbottom")
+    play_game.theme.font["size"] = 25
+    play_game.theme.button["text-color"] = (125, 255, 125)
+    play_game.make_image()
+
+    optionsb = gui.Button(main_win, play_game.rect.midbottom, "LEAVE", "Return to main menu.",
+                           widget_pos="midtop")
+
+    exit_game = gui.Button(main_win, optionsb.rect.midbottom, "QUIT", "Exit Game",
+                           widget_pos="midtop")
+
+    if myConfig.music:
+        sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
+
+        sfx_select.set_volume(myConfig.sound_volume*0.02) 
+
+    while 1:
+        for event in app.get_events():
+            if event.type == QUIT:
+                return "QUIT"
+            if event.type == gui.GUI_EVENT:
+                if event.name == "Menu":
+                    event = event.subevent
+                    if event.widget == gui.Button:
+                        if myConfig.music:
+                            sfx_select.play()
+                    if event.action == gui.GUI_EVENT_CLICK:
+                        return event.name
+
+        screen.blit(bg, (0,0))
+        screen.blit(app.render(), (0,0))
+        pygame.display.flip()
