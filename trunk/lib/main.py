@@ -151,7 +151,8 @@ def game(screen, myConfig):
     clock = pygame.time.Clock()
 
     zoom_states = [(10, 5), (20, 10), (40, 20), (80, 40)]
-    zoom_state = 3
+    zoom_state = 0
+    world_zoom_once = True
 
     game_over = False
 
@@ -333,6 +334,7 @@ def game(screen, myConfig):
             picktwo = []
 
         if not controllers[whos_turn] == "human":
+            end_turn_button.visible = False
             u = controllers[whos_turn]
 
             msg = u.update(whos_turn) # get messages from ai
@@ -383,12 +385,19 @@ def game(screen, myConfig):
                         i[1].highlighted = False
                     picktwo = []
                     world.update()
+        else:
+            end_turn_button.visible = True
 
         screen.fill((0,0,0))
         world.render()
         for i in world.players:
             if len(i.territories) == 0:
                 i.dead = True
+
+        if world_zoom_once:
+            world_zoom_once = False
+            world.tile_size = zoom_states[zoom_state]
+            world.update()
 
         if pad_up_button.is_clicked():
             world.offset[1] -= SCROLL_SPEED
