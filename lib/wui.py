@@ -445,3 +445,24 @@ def pre_single_game(screen):
 
         screen.blit(app.render(), (0,0))
         pygame.display.flip()
+
+def map_loading(screen):
+    app = gui.App(pygame.Surface(screen.get_size()))
+    app.theme = gui.make_theme(os.path.join("data", "gui"))
+
+    game_name_label = gui.Label(app, (-1, 0),
+                              "GNL", "RoboWars",
+                              widget_pos="midtop")
+    game_name_label.theme.font["size"] = 60
+    game_name_label.theme.label["text-color"] = (0, 255, 0)
+    game_name_label.make_image()
+
+    message = gui.Label(app, (-1, -1),
+                              "GNL", "Map is loading... please wait...",
+                              widget_pos="midtop")
+    message.theme.font["size"] = 35
+    message.theme.label["text-color"] = (255, 0, 0)
+    message.make_image()
+
+    screen.blit(app.render(), (0,0))
+    pygame.display.flip()
