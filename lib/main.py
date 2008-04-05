@@ -5,17 +5,23 @@ import util
 import rules
 
 import gui, wui
+import config
 
 import random
 
 import time, os, sys
 
-import client
-
 pygame.mixer.init()
 
 SCROLL_ZONE = 5
 SCROLL_SPEED = 12
+
+conf = None # Contains all user configs
+if os.path.exists("settings.py"): # Get user settings if any
+    import settings
+    conf = settings.c
+else: # Or load defaults
+    conf = config.Config()
 
 try:
     import psyco
@@ -92,8 +98,9 @@ def game(screen):
     world = World(world_screen, map_grid=mg)
     make_map_players(world)
 
-    pygame.mixer.music.load(os.path.join('data','music','slowtheme.ogg'))
-    pygame.mixer.music.play(-1)
+    if conf.music:
+        pygame.mixer.music.load(os.path.join('data','music','slowtheme.ogg'))
+        pygame.mixer.music.play(-1)
 
     picktwo = []
     whos_turn = 0
