@@ -8,6 +8,7 @@ player_count = 0
 loop = 0
 connection = None
 client = None
+factory = None
 
 class Client(pb.Referenceable):
     def __init__(self, name):
@@ -23,8 +24,14 @@ class Client(pb.Referenceable):
     def remote_send_players(self, data):
         self.players = data
 
-    def remote_send_chat_msg(self, name, msg):
-        print name, "said:", msg
+    def remote_send_chat_msg(self, msg):
+        print msg
+
+    def remote_server_disconnect(self, msg):
+        """Server forced disconnect"""
+        print "Disconnected:", msg
+        # Go back to menu
+        reactor.callLater(0, reactor.stop)
 
     def handle_connect_error(self, error):
         print "Error connecting: " + str(error.value)
@@ -45,8 +52,8 @@ def main_loop():
         print "Names ",
         for i in client.players:
             print i.name,
+        print ''
         sys.stdout.flush()
-        #print '' # Flush
         player_count = cur_players
 
     #msg = input("Chat: ")
@@ -59,7 +66,7 @@ def main_loop():
 
 def handle_signal(signal, frame):
     def disconnect(ref=None):
-        reactor.stop()
+        reactor.callLater(0, reactor.stop)
 
     # We haven't made a connection yet
     if not 'server' in client.__dict__:
@@ -72,14 +79,19 @@ def handle_signal(signal, frame):
         disconnect()
 
 def connect(name, host, port):
-    global client
+    def quit(err):
+        print err.value
+        # callLater workaround for regression in twisted 8.0.1
+        reactor.callLater(0, reactor.stop)
+    global client, factory
 
     client = Client(name)
     factory = pb.PBClientFactory()
     connection = reactor.connectTCP(host, port, factory)
     d = factory.getRootObject()
     d.addCallback(client.connected)
-    d.addErrback(client.handle_connect_error)
+    d.addErrback(quit)
+    #d.addErrback(client.handle_connect_error)
     reactor.run()
 
 signal.signal(signal.SIGINT, handle_signal)
