@@ -148,7 +148,7 @@ def do_battle(screen, picktwo, world, myConfig):
     if myConfig.music:
         sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
 
-        sfx_select.set_volume(myConfig.sound_volume) 
+        sfx_select.set_volume(myConfig.sound_volume*0.02) 
 
     while 1:
         for event in app.get_events():
@@ -213,7 +213,7 @@ def move_troops(screen, picktwo, world, myConfig):
     if myConfig.music:
         sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
 
-        sfx_select.set_volume(myConfig.sound_volume) 
+        sfx_select.set_volume(myConfig.sound_volume*0.02) 
 
     while 1:
         for event in app.get_events():
@@ -266,7 +266,7 @@ def gain_troops(screen, player, myConfig):
     if myConfig.music:
         sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
 
-        sfx_select.set_volume(myConfig.sound_volume) 
+        sfx_select.set_volume(myConfig.sound_volume*0.02) 
 
     while 1:
         for event in app.get_events():
@@ -326,7 +326,7 @@ def Options(screen, myConfig):
     if myConfig.music:
         sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
 
-        sfx_select.set_volume(myConfig.sound_volume) 
+        sfx_select.set_volume(myConfig.sound_volume*0.02) 
 
     sdlabel = gui.Label(app, (screen.get_width(), 60),
                         "SDLabel", "display:",
@@ -400,7 +400,7 @@ def MainMenu(screen, myConfig):
     if myConfig.music:
         sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
 
-        sfx_select.set_volume(myConfig.sound_volume) 
+        sfx_select.set_volume(myConfig.sound_volume*0.02) 
 
     while 1:
         for event in app.get_events():
@@ -457,7 +457,7 @@ def pre_single_game(screen, myConfig):
     if myConfig.music:
         sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
 
-        sfx_select.set_volume(myConfig.sound_volume) 
+        sfx_select.set_volume(myConfig.sound_volume*0.02) 
 
     num_ai = gui.Label(app, (-1, -1),
                        "AI", "ai players: 6", widget_pos="midtop")
