@@ -104,7 +104,7 @@ def resize_image(image, size):
                                     (size[0] - bsize[0] * 2, bsize[1]))
     botright = image.subsurface((bsize[0] * 2, bsize[1] * 2), bsize)
 
-    new = pygame.Surface(size).convert()
+    new = pygame.Surface(size).convert_alpha()
     new.blit(topleft, (0, 0))
     new.blit(top, (bsize[0], 0))
     new.blit(topright, (size[0] - bsize[0], 0))
@@ -1130,14 +1130,14 @@ class Window(Widget):
             else:
                 self.border_offset = (0, 0)
                 self.border = None
-                self.surface = pygame.Surface(self.size).convert()
+                self.surface = pygame.Surface(self.size).convert_alpha()
                 self.__old_draw_area = self.surface.copy()
                 self.rect = self.surface.get_rect()
                 setattr(self.rect, self.widget_pos, self.pos)
         else:
             self.border_offset = (0, 0)
             self.border = None
-            self.surface = pygame.Surface(self.size).convert()
+            self.surface = pygame.Surface(self.size).convert_alpha()
             self.__old_draw_area = self.surface.copy()
             self.rect = self.surface.get_rect()
             setattr(self.rect, self.widget_pos, self.pos)

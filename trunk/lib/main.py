@@ -233,29 +233,32 @@ def game(screen):
                    util.connected_mass(picktwo[0][1].terr, picktwo[1][1].terr):
                     if not picktwo[0][0] == picktwo[1][0]:
                         if picktwo[0][1].can_move:
-                            x, y = rules.perform_battle(picktwo[0][1], picktwo[1][1])
-                            picktwo[0][1].units -= x
-                            picktwo[1][1].units -= y
-                            
-                            if picktwo[1][1].units == 0:
-                                world.players[picktwo[1][0]].territories.remove(picktwo[1][1])
-                                world.players[picktwo[0][0]].territories.append(picktwo[1][1])
+                            if wui.do_battle(screen, picktwo, world):
+                                x, y = rules.perform_battle(picktwo[0][1], picktwo[1][1])
+                                picktwo[0][1].units -= x
+                                picktwo[1][1].units -= y
+                                
+                                if picktwo[1][1].units == 0:
+                                    world.players[picktwo[1][0]].territories.remove(picktwo[1][1])
+                                    world.players[picktwo[0][0]].territories.append(picktwo[1][1])
 
-                                world.world_image = None #force rerender
+                                    world.world_image = None #force rerender
 
-                                if world.players[picktwo[1][0]].territories == []:
-                                    world.players[picktwo[1][0]].dead = True
+                                    if world.players[picktwo[1][0]].territories == []:
+                                        world.players[picktwo[1][0]].dead = True
 
-                                if picktwo[1][1].max_units > picktwo[0][1].units - 1:
-                                    picktwo[1][1].units = picktwo[0][1].units - 1
-                                    picktwo[0][1].units = 1
-                                else:
-                                    picktwo[1][1].units = picktwo[1][1].max_units
-                                    picktwo[0][1].units -= picktwo[1][1].units
-                            picktwo[0][1].update()
-                            picktwo[1][1].update()
+                                    if picktwo[1][1].max_units > picktwo[0][1].units - 1:
+                                        picktwo[1][1].units = picktwo[0][1].units - 1
+                                        picktwo[0][1].units = 1
+                                    else:
+                                        picktwo[1][1].units = picktwo[1][1].max_units
+                                        picktwo[0][1].units -= picktwo[1][1].units
+                                picktwo[0][1].update()
+                                picktwo[1][1].update()
 
-                            print "casualties: %s, %s"%(x, y)
+                                print "casualties: %s, %s"%(x, y)
+                            else:
+                                print "attack canceled!"
                         else:
                             print "%s cannot move this turn!"%picktwo[0][1]
                     else:
