@@ -218,6 +218,7 @@ def game(screen):
             if not i[1].highlighted: # Don't force a re-render if already highlighted
                 i[1].highlighted = True
                 world.update()
+                world.render()
 
 
         #BATTLES!
@@ -227,6 +228,7 @@ def game(screen):
                (not picktwo[0][1].can_move):
                 picktwo[0][1].highlighted = False
                 picktwo = []
+                world.update()
         if len(picktwo) == 2:
             if picktwo[0][0] == whos_turn:
                 if (not picktwo[0][1] == picktwo[1][1]) and \
@@ -264,16 +266,19 @@ def game(screen):
                     else:
                         print "player territories - moving units"
                         if picktwo[0][1].can_move:
-                            x = picktwo[0][1].units - 1
-                            if picktwo[1][1].max_units >= picktwo[1][1].units + x:
-                                pass
+                            if wui.move_troops(screen, picktwo, world):
+                                x = picktwo[0][1].units - 1
+                                if picktwo[1][1].max_units >= picktwo[1][1].units + x:
+                                    pass
+                                else:
+                                    x = picktwo[1][1].max_units - picktwo[1][1].units
+                                picktwo[0][1].units -= x
+                                picktwo[1][1].units += x
+                                picktwo[0][1].update()
+                                picktwo[1][1].update()
+                                picktwo[1][1].can_move = False
                             else:
-                                x = picktwo[1][1].max_units - picktwo[1][1].units
-                            picktwo[0][1].units -= x
-                            picktwo[1][1].units += x
-                            picktwo[0][1].update()
-                            picktwo[1][1].update()
-                            picktwo[1][1].can_move = False
+                                pass
                         else:
                             print "%s cannot move this turn!"%picktwo[0][1]
 
