@@ -147,17 +147,17 @@ def game(screen, myConfig, nump, numai):
                       pygame.mixer.Sound(os.path.join("data", "sfx", "battle2.ogg")),
                       pygame.mixer.Sound(os.path.join("data", "sfx", "battle3.ogg"))]
         for i in sfx_battle:
-            i.set_volume(int(myConfig.sound_volume/4))
+            i.set_volume(myConfig.sound_volume*0.02)
 
         sfx_victory = pygame.mixer.Sound(os.path.join("data", "sfx", "victory.ogg"))
         sfx_defeat = pygame.mixer.Sound(os.path.join("data", "sfx", "defeat.ogg"))
 
-        sfx_victory.set_volume(int(myConfig.sound_volume/4))
-        sfx_defeat.set_volume(int(myConfig.sound_volume/4))
+        sfx_victory.set_volume(myConfig.sound_volume*0.02)
+        sfx_defeat.set_volume(myConfig.sound_volume*0.02)
 
         sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
 
-        sfx_select.set_volume(myConfig.sound_volume) 
+        sfx_select.set_volume(myConfig.sound_volume*0.02) 
 
     picktwo = []
     whos_turn = 0
