@@ -6,8 +6,8 @@ import config
 
 conf = config.Config()
 
-MAX_PLAYERS = 2
-PLAYER_TIMEOUT = conf.player_timeout # default 60s
+MAX_PLAYERS = 7 # TODO get this var
+PLAYER_TIMEOUT = conf.player_timeout # default 120s
 
 class GameServer(pb.Root):
     def __init__(self, game_type="multi"):
@@ -16,6 +16,13 @@ class GameServer(pb.Root):
         self.play_order = []
 
         self._last_send_index = 0
+
+    def remote_start_game(self, client, map):
+        # Don't allow non-game creator to start
+        if client != self.players:
+            return
+        # TODO: probably change this to whatever name the game is currently using
+        self.map = map
 
     def remove_user(self, user):
         self.players.remove(user)
@@ -78,6 +85,10 @@ class GameServer(pb.Root):
             if i.client == remote_ref:
                 return i
 
+    def make_user_numbers(self):
+        self.player_nums = range(len(self.players))
+        random.shuffle(self.player_nums)
+
     def error(self, msg):
         print msg
 
@@ -87,6 +98,7 @@ class User(object):
         self.name = name
         self.color = color
         self.alive = True
+        self.AI = False
 
 class CopyUser(User, pb.Copyable):
     def getStateToCopy(self):
