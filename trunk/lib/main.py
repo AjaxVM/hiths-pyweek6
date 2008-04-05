@@ -436,12 +436,6 @@ def main():
     pygame.init()
     screen = do_settings(myConfig)
 
-##    wui.pre_single_game(screen)
-
-##    uname = wui.get_username(screen)
-
-##    game(screen, myConfig)
-
     goto = "MainMenu"
     while 1:
         if goto == "MainMenu":
@@ -461,6 +455,7 @@ def main():
             if c == "MainMenu":
                 goto = c
                 continue
+            wui.map_loading(screen)
             a = game(screen, myConfig, c[1], c[2])
             if a == "QUIT":
                 pygame.quit()
