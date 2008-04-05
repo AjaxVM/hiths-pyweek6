@@ -6,9 +6,8 @@ import sys, signal
 
 player_count = 0
 loop = 0
-connection = None
 client = None
-factory = None
+game_creator = False
 
 class Client(pb.Referenceable):
     def __init__(self, name):
@@ -19,6 +18,10 @@ class Client(pb.Referenceable):
         """Connected, send information and a remote reference"""
         self.server = remote_ref
         self.server.callRemote("join", self, self.name)
+        # TODO: game creator starts game here
+        if game_creator:
+            # generate map
+            self.server.callRemote("start_game", self, map)
         main_loop()
 
     def remote_send_players(self, data):
@@ -34,9 +37,9 @@ class Client(pb.Referenceable):
         reactor.callLater(0, reactor.stop)
 
     def handle_connect_error(self, error):
-        print "Error connecting: " + str(error.value)
-        #connection.disconnect()
-        reactor.stop()
+        print error.value # TODO dialog for this
+        # callLater workaround for regression in twisted 8.0.1
+        reactor.callLater(0, reactor.stop())
 
 class RemoteUser(User, pb.RemoteCopy):
     pass
@@ -79,19 +82,14 @@ def handle_signal(signal, frame):
         disconnect()
 
 def connect(name, host, port):
-    def quit(err):
-        print err.value
-        # callLater workaround for regression in twisted 8.0.1
-        reactor.callLater(0, reactor.stop)
-    global client, factory
+    global client
 
     client = Client(name)
     factory = pb.PBClientFactory()
-    connection = reactor.connectTCP(host, port, factory)
+    reactor.connectTCP(host, port, factory)
     d = factory.getRootObject()
     d.addCallback(client.connected)
-    d.addErrback(quit)
-    #d.addErrback(client.handle_connect_error)
+    d.addErrback(client.handle_connect_error)
     reactor.run()
 
 signal.signal(signal.SIGINT, handle_signal)
