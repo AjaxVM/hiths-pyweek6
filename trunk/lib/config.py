@@ -13,6 +13,7 @@ class Config(object):
         self.attack_dialog = 1
         self.move_dialog = 1
         self.new_unit_dialog = 1
+        self.sound_volume = 100#full*0.01
         self.make_file()
         self.open_settings()
 

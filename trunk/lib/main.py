@@ -417,6 +417,7 @@ def game(screen, myConfig):
 def main():
     myConfig = config.Config()
     pygame.init()
+    pygame.mixer.music.set_volume(myConfig.sound_volume*0.01)
     screen_size = (myConfig.screen_width, myConfig.screen_height)
     screen = pygame.display.set_mode(screen_size)
 
