@@ -161,8 +161,24 @@ class Player(object):
                 self.territories[index].set_supply()
                 break
 
+        num_troops = len(self.territories)
+        while num_troops:
+            for i in self.territories:
+                if not i.capitol or i.supply:
+                    if num_troops:
+                        new = random.randint(0, 1)
+                        if i.units + new > i.max_units:
+                            new = i.max_units - i.units
+                        i.units += new
+                        num_troops -= new
+
         for i in self.territories:
-            i.units = 4
+            if i.capitol or i.supply:
+                i.units = 4
+            else:
+                i.units += 1
+                if i.units > i.max_units:
+                    i.units = i.max_units
             i.update()
 
         self.color = color
