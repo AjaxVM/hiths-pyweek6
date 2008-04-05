@@ -148,15 +148,9 @@ class PlayerTerritory(object):
 
 class Player(object):
     def __init__(self, all_terr=[], color=(255, 255, 0)):
-##        self.start_terr.set_capitol()
         self.territories = all_terr
 
         # Place a supply center in one of the player's territories
-##        while True:
-##            index = random.randint(0, len(self.territories)-1)
-##            if not self.territories[index].capitol: # Unless there is a capitol
-##                self.territories[index].set_supply()
-##                break
         big1 = big2 = None
         for i in self.territories:
             if not big1:

@@ -193,3 +193,47 @@ def move_troops(screen, picktwo, world):
         screen.blit(bg, (0,0))
         screen.blit(app.render(), (0,0))
         pygame.display.flip()
+
+def gain_troops(screen, player):
+    bg = screen.copy()
+    app = gui.App(pygame.Surface(screen.get_size()).convert_alpha(), background_color=(0,0,0,0))
+    app.theme = gui.make_theme(os.path.join("data", "gui"))
+
+    main_win = gui.Window(app, (-1, -1), "MainWindow", "center", [300, 260],
+                          caption="Gain Troops")
+
+    p1_label1 = gui.Label(main_win, (-1, -1), "P1_LABEL1", "New Troops: ",
+                          widget_pos="midright")
+    p1_label2 = gui.Label(main_win, (-1, -1),
+                          "P1_LABEL2", "%s"%player.get_terr_holding(),
+                          widget_pos="midleft")
+    p1_label1.theme.label["text-color"] = player.color
+    p1_label2.theme.label["text-color"] = player.color
+    p1_label1.make_image()
+    p1_label2.make_image()
+
+    cont_button = gui.Button(main_win, (-1, 260), "CONTINUE", "Continue",
+                               widget_pos="midbottom")
+
+
+    do_again = CheckBox(main_win, (300, 0), "CB1", "topright")
+    dal = gui.Label(main_win, (300-do_again.button.over_width,
+                               do_again.button.over_height),
+                    "DALabel", "Don't show again: ",
+                    widget_pos="bottomright")
+
+    while 1:
+        for event in app.get_events():
+            if event.type == QUIT:
+                pygame.quit()
+                return
+            if event.type == gui.GUI_EVENT:
+                if event.name == "MainWindow":
+                    event = event.subevent
+                    do_again.event(event)
+                    if event.name == "CONTINUE" and event.action == gui.GUI_EVENT_CLICK:
+                        return True, do_again.state
+
+        screen.blit(bg, (0,0))
+        screen.blit(app.render(), (0,0))
+        pygame.display.flip()
