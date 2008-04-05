@@ -170,8 +170,6 @@ def game(screen, myConfig, nump, numai):
     zoom_state = 0
     world_zoom_once = True
 
-    game_over = False
-
     while 1:
         clock.tick(600)
         if myConfig.fps_counter:
@@ -266,7 +264,9 @@ def game(screen, myConfig, nump, numai):
                           widget_pos="center")
             finish_label.theme.label["text-color"] = world.players[world.one_winner()[1]].color
             finish_label.theme.label["font"] = pygame.font.Font(None, 45)
-            game_over = True
+            world.update()
+            world.render()
+            return wui.win_screen(screen, world, myConfig)
 
         for i in picktwo:
             if not i[1].highlighted: # Don't force a re-render if already highlighted
@@ -413,19 +413,18 @@ def game(screen, myConfig, nump, numai):
                 u2.update()
                 u1.can_move = False
             if msg[0] == "end_turn":
-                if not game_over:
-                    controllers[whos_turn].mode = "attack"
-                    world.players[whos_turn].end_turn()
-                    whos_turn += 1
-                    if whos_turn >= len(world.players):
-                        whos_turn = 0
-                    whos_turn_label.text = "It is player %ss turn"%(whos_turn+1)
-                    whos_turn_label.theme.label["text-color"] = world.players[whos_turn].color
-                    whos_turn_label.make_image()
-                    for i in picktwo:
-                        i[1].highlighted = False
-                    picktwo = []
-                    world.update()
+                controllers[whos_turn].mode = "attack"
+                world.players[whos_turn].end_turn()
+                whos_turn += 1
+                if whos_turn >= len(world.players):
+                    whos_turn = 0
+                whos_turn_label.text = "It is player %ss turn"%(whos_turn+1)
+                whos_turn_label.theme.label["text-color"] = world.players[whos_turn].color
+                whos_turn_label.make_image()
+                for i in picktwo:
+                    i[1].highlighted = False
+                picktwo = []
+                world.update()
         else:
             end_turn_button.visible = True
 
