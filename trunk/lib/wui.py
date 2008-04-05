@@ -105,7 +105,7 @@ def get_bad_username(screen):
         screen.blit(app.render(), (0,0))
         pygame.display.flip()
 
-def do_battle(screen, picktwo, world):
+def do_battle(screen, picktwo, world, myConfig):
     bg = screen.copy()
     app = gui.App(pygame.Surface(screen.get_size()).convert_alpha(), background_color=(0,0,0,0))
     app.theme = gui.make_theme(os.path.join("data", "gui"))
@@ -145,6 +145,11 @@ def do_battle(screen, picktwo, world):
                     "DALabel", "Don't show again: ",
                     widget_pos="bottomright")
 
+    if myConfig.music:
+        sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
+
+        sfx_select.set_volume(myConfig.sound_volume) 
+
     while 1:
         for event in app.get_events():
             if event.type == QUIT:
@@ -153,6 +158,9 @@ def do_battle(screen, picktwo, world):
                 if event.name == "MainWindow":
                     event = event.subevent
                     do_again.event(event)
+                    if event.widget == gui.Button:
+                        if myConfig.music:
+                            sfx_select.play()
                     if event.name == "ATTACK" and event.action == gui.GUI_EVENT_CLICK:
                         return True, do_again.state
                     if event.name == "CANCEL" and event.action == gui.GUI_EVENT_CLICK:
@@ -162,7 +170,7 @@ def do_battle(screen, picktwo, world):
         screen.blit(app.render(), (0,0))
         pygame.display.flip()
 
-def move_troops(screen, picktwo, world):
+def move_troops(screen, picktwo, world, myConfig):
     bg = screen.copy()
     app = gui.App(pygame.Surface(screen.get_size()).convert_alpha(), background_color=(0,0,0,0))
     app.theme = gui.make_theme(os.path.join("data", "gui"))
@@ -202,6 +210,11 @@ def move_troops(screen, picktwo, world):
                     "DALabel", "Don't show again: ",
                     widget_pos="bottomright")
 
+    if myConfig.music:
+        sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
+
+        sfx_select.set_volume(myConfig.sound_volume) 
+
     while 1:
         for event in app.get_events():
             if event.type == QUIT:
@@ -210,6 +223,9 @@ def move_troops(screen, picktwo, world):
                 if event.name == "MainWindow":
                     event = event.subevent
                     do_again.event(event)
+                    if event.widget == gui.Button:
+                        if myConfig.music:
+                            sfx_select.play()
                     if event.name == "TRANSFER" and event.action == gui.GUI_EVENT_CLICK:
                         return True, do_again.state
                     if event.name == "CANCEL" and event.action == gui.GUI_EVENT_CLICK:
@@ -219,7 +235,7 @@ def move_troops(screen, picktwo, world):
         screen.blit(app.render(), (0,0))
         pygame.display.flip()
 
-def gain_troops(screen, player):
+def gain_troops(screen, player, myConfig):
     bg = screen.copy()
     app = gui.App(pygame.Surface(screen.get_size()).convert_alpha(), background_color=(0,0,0,0))
     app.theme = gui.make_theme(os.path.join("data", "gui"))
@@ -247,6 +263,11 @@ def gain_troops(screen, player):
                     "DALabel", "Don't show again: ",
                     widget_pos="bottomright")
 
+    if myConfig.music:
+        sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
+
+        sfx_select.set_volume(myConfig.sound_volume) 
+
     while 1:
         for event in app.get_events():
             if event.type == QUIT:
@@ -255,6 +276,9 @@ def gain_troops(screen, player):
                 if event.name == "MainWindow":
                     event = event.subevent
                     do_again.event(event)
+                    if event.widget == gui.Button:
+                        if myConfig.music:
+                            sfx_select.play()
                     if event.name == "CONTINUE" and event.action == gui.GUI_EVENT_CLICK:
                         return True, do_again.state
 
@@ -282,8 +306,8 @@ def Options(screen, myConfig):
     #make entries...
     entries = []
     boxes = []
-    for i in ["fullscreen", "music", "sfx",
-              "fps_counter", "attack_dialog", "move_dialog", "new_unit_dialog"]:
+    for i in ["fullscreen", "music", "fps_counter",
+              "attack_dialog", "move_dialog", "new_unit_dialog"]:
         if not entries:
             new = gui.Label(app, (15, 60), i, i,
                             widget_pos="topleft")
@@ -298,6 +322,11 @@ def Options(screen, myConfig):
             do_again = CheckBox(app, (300, entries[-2].rect.bottom+10), i, "topright")
             do_again.set_state(getattr(myConfig, i))
             boxes.append(do_again)
+
+    if myConfig.music:
+        sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
+
+        sfx_select.set_volume(myConfig.sound_volume) 
 
     sdlabel = gui.Label(app, (screen.get_width(), 60),
                         "SDLabel", "display:",
@@ -321,6 +350,9 @@ def Options(screen, myConfig):
             if event.type == gui.GUI_EVENT:
                 for i in boxes:
                     i.event(event)
+                if event.widget == gui.Button:
+                    if myConfig.music:
+                        sfx_select.play()
                 if event.name == "GB":
                     if event.action == gui.GUI_EVENT_CLICK:
                         #prepare config
@@ -342,7 +374,7 @@ def Options(screen, myConfig):
         pygame.display.flip()
 
 
-def MainMenu(screen):
+def MainMenu(screen, myConfig):
     app = gui.App(pygame.Surface(screen.get_size()))
     app.theme = gui.make_theme(os.path.join("data", "gui"))
 
@@ -365,11 +397,19 @@ def MainMenu(screen):
     exit_game = gui.Button(app, optionsb.rect.midbottom, "Exit", "Exit",
                            widget_pos="midtop")
 
+    if myConfig.music:
+        sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
+
+        sfx_select.set_volume(myConfig.sound_volume) 
+
     while 1:
         for event in app.get_events():
             if event.type == QUIT:
                 return "QUIT"
             if event.type == gui.GUI_EVENT:
+                if event.widget == gui.Button:
+                    if myConfig.music:
+                        sfx_select.play()
                 if event.name == "PlaySingle":
                     if event.action == gui.GUI_EVENT_CLICK:
                         return "PlaySingle"
@@ -383,7 +423,7 @@ def MainMenu(screen):
         screen.blit(app.render(), (0,0))
         pygame.display.flip()
 
-def pre_single_game(screen):
+def pre_single_game(screen, myConfig):
     app = gui.App(pygame.Surface(screen.get_size()))
     app.theme = gui.make_theme(os.path.join("data", "gui"))
 
@@ -414,6 +454,11 @@ def pre_single_game(screen):
     nbar.max_value = 70
     nbar.min_value = 20
 
+    if myConfig.music:
+        sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
+
+        sfx_select.set_volume(myConfig.sound_volume) 
+
     num_ai = gui.Label(app, (-1, -1),
                        "AI", "ai players: 6", widget_pos="midtop")
     vbar = gui.ScrollBar(app, num_ai.rect.midright,
@@ -436,6 +481,9 @@ def pre_single_game(screen):
             if event.type == QUIT:
                 return "QUIT"
             if event.type == gui.GUI_EVENT:
+                if event.widget == gui.Button:
+                    if myConfig.music:
+                        sfx_select.play()
                 if event.name == "GB":
                     if event.action == gui.GUI_EVENT_CLICK:
                         return "MainMenu"

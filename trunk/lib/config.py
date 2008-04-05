@@ -8,7 +8,6 @@ class Config(object):
         self.screen_width = 640
         self.fullscreen = 0
         self.music = 1
-        self.sfx = 1
         self.fps_counter = 0
         self.attack_dialog = 1
         self.move_dialog = 1

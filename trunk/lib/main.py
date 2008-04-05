@@ -143,6 +143,22 @@ def game(screen, myConfig, nump, numai):
         pygame.mixer.music.load(os.path.join('data','music','slowtheme.ogg'))
         pygame.mixer.music.play(-1)
 
+        sfx_battle = [pygame.mixer.Sound(os.path.join("data", "sfx", "battle1.ogg")),
+                      pygame.mixer.Sound(os.path.join("data", "sfx", "battle2.ogg")),
+                      pygame.mixer.Sound(os.path.join("data", "sfx", "battle3.ogg"))]
+        for i in sfx_battle:
+            i.set_volume(int(myConfig.sound_volume/4))
+
+        sfx_victory = pygame.mixer.Sound(os.path.join("data", "sfx", "victory.ogg"))
+        sfx_defeat = pygame.mixer.Sound(os.path.join("data", "sfx", "defeat.ogg"))
+
+        sfx_victory.set_volume(int(myConfig.sound_volume/4))
+        sfx_defeat.set_volume(int(myConfig.sound_volume/4))
+
+        sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
+
+        sfx_select.set_volume(myConfig.sound_volume) 
+
     picktwo = []
     whos_turn = 0
 
@@ -165,7 +181,6 @@ def game(screen, myConfig, nump, numai):
 
         for event in app.get_events():
             if event.type == QUIT:
-##                pygame.quit()
                 return "QUIT"
             if event.type == KEYDOWN:
                 if event.key == K_s:
@@ -202,11 +217,13 @@ def game(screen, myConfig, nump, numai):
 
             if event.type == gui.GUI_EVENT:
                 if event.widget == gui.Button:
+                    if myConfig.music:
+                        sfx_select.play()
                     if event.name == "End Turn":
                         if event.action == gui.GUI_EVENT_CLICK:
                             if controllers[whos_turn] == "human":
                                 if myConfig.new_unit_dialog:
-                                    a = wui.gain_troops(screen, world.players[whos_turn])
+                                    a = wui.gain_troops(screen, world.players[whos_turn], myConfig)
                                     if a == "QUIT":
                                         return "QUIT"
                                     if a[1]: #don't do again!
@@ -266,7 +283,7 @@ def game(screen, myConfig, nump, numai):
                     if not picktwo[0][0] == picktwo[1][0]:
                         if picktwo[0][1].can_move:
                             if myConfig.attack_dialog:
-                                a = wui.do_battle(screen, picktwo, world)
+                                a = wui.do_battle(screen, picktwo, world, myConfig)
                                 if a == "QUIT":
                                     return "QUIT"
                                 if a[1]: #don't do again!
@@ -276,9 +293,20 @@ def game(screen, myConfig, nump, numai):
                             else:
                                 a = True
                             if a:
+                                if myConfig.music:
+                                    a = random.choice(sfx_battle)
+                                    a.play()
+                                    time.sleep(a.get_length()+0.1)
                                 x, y = rules.perform_battle(picktwo[0][1], picktwo[1][1])
                                 picktwo[0][1].units -= x
                                 picktwo[1][1].units -= y
+
+                                if x > y:
+                                    if myConfig.music:
+                                        sfx_defeat.play()
+                                else:
+                                    if myConfig.music:
+                                        sfx_victory.play()
                                 
                                 if picktwo[1][1].units == 0:
                                     world.players[picktwo[1][0]].territories.remove(picktwo[1][1])
@@ -305,7 +333,7 @@ def game(screen, myConfig, nump, numai):
                         print "player territories - moving units"
                         if picktwo[0][1].can_move:
                             if myConfig.move_dialog:
-                                a = wui.move_troops(screen, picktwo, world)
+                                a = wui.move_troops(screen, picktwo, world, myConfig)
                                 if a == "QUIT":
                                     return "QUIT"
                                 if a[1]: #don't do again!
@@ -449,7 +477,7 @@ def main():
     goto = "MainMenu"
     while 1:
         if goto == "MainMenu":
-            a = wui.MainMenu(screen)
+            a = wui.MainMenu(screen, myConfig)
             if a == "QUIT":
                 pygame.quit()
                 return
@@ -458,7 +486,7 @@ def main():
             if a == "Options":
                 goto = a
         if goto == "Game":
-            c = wui.pre_single_game(screen)
+            c = wui.pre_single_game(screen, myConfig)
             if c == "QUIT":
                 pygame.quit()
                 return
