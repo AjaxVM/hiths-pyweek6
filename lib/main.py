@@ -75,9 +75,9 @@ def game(screen):
     app = gui.App(screen, background_color=None)
     app.theme = gui.make_theme(os.path.join("data", "gui"))
     app.always_render = True
-    end_turn_button = gui.Button(app, (-1, 480), "End Turn", "End Turn",
+    end_turn_button = gui.Button(app, (-1, screen_size[1]), "End Turn", "End Turn",
                                 widget_pos="bottomleft")
-    whos_turn_label = gui.Label(app, (-1, 480), "WT Label", "It is player 1's turn",
+    whos_turn_label = gui.Label(app, (-1, screen_size[1]), "WT Label", "It is player 1's turn",
                           widget_pos="bottomright")
     whos_turn_label.theme.label["text-color"] = [255,0,0]
     whos_turn_label.make_image()
@@ -321,7 +321,7 @@ def game(screen):
 
 def main():
     pygame.init()
-    screen_size = (640, 480)
+    screen_size = (1024, 768)
     screen = pygame.display.set_mode(screen_size)
 
     uname = wui.get_username(screen)
