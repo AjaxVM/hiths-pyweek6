@@ -3,28 +3,10 @@
 = The Buglist =
 
 Squash 'em if you can:
-  * Random map generation crash, unfortunately a real pain
-{{{
-Traceback (most recent call last):
-  File "run_game.py", line 6, in <module>
-    main.main()
-  File "lib/main.py", line 73, in main
-    make_map_players(world)
-  File "lib/main.py", line 29, in make_map_players
-    new = Player(mg.comp_terrs[0], mg.comp_terrs[0:4], (255, 0, 0))
-  File "lib/world.py", line 122, in __init__
-    i.update()
-  File "lib/world.py", line 108, in update
-    c = x.pop()
-IndexError: pop from empty list
-}}}
   * Better placement for capitols, preferably next to another friendly territory
-  * Do not generate territories with less than five squares -- this is the bug the above traceback is for.
   * Zooming needs to center on mouse cursor, or at least put things in the upper left corner with higher resolutions
   * Tile size should grow by default on higher resolutions
-  * Remove players with no territories from the turn list -- isn't this already done?
   * Do something to actually end the game when it is over
   * Map should be centered and not clumped in bottom right corner - this is due to the world renderer - it is only on the right when zoomed out - partly because every where else is water - this should probably be fixed - but not really a biggie right now.
-  * There seems to be a bug where sometimes the game says a territory is not connected to any other when it really is - or at least it should have been removed if not...
   * More which we have forgotten.. =(
-  * there is a problem with the music playback on different systes that requires different magic numbers to work :(
+  * there is a problem with the music playback on different systems that requires different magic numbers to work :(
