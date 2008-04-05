@@ -138,6 +138,8 @@ def game(screen, myConfig):
     world = World(world_screen, map_grid=mg,
                   background=pygame.image.load(os.path.join("data", "images", "bg1.png")).convert())
     controllers = make_map_players(world)
+    world_rect = world.display.get_rect()
+    world_rect.topleft = world.display.get_offset()
 
     if myConfig.music:
         pygame.mixer.music.load(os.path.join('data','music','slowtheme.ogg'))
@@ -226,6 +228,11 @@ def game(screen, myConfig):
                                     i[1].highlighted = False
                                 picktwo = []
                                 world.update()
+            if event.type == MOUSEMOTION:
+                if pygame.mouse.get_pressed()[0]:
+                    if world_rect.collidepoint(pygame.mouse.get_pos()):
+                        world.offset[0] -= event.rel[0]
+                        world.offset[1] -= event.rel[1]
 
         if world.players[whos_turn].dead:
             whos_turn += 1
