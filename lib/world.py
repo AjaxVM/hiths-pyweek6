@@ -147,21 +147,38 @@ class PlayerTerritory(object):
         return terr # All tiles without an actor
 
 class Player(object):
-    def __init__(self, start_terr=None, all_terr=[], color=(255, 255, 0)):
-        self.start_terr = start_terr
-        self.start_terr.player = self
-        self.start_terr.units = 4
-        self.start_terr.set_capitol()
+    def __init__(self, all_terr=[], color=(255, 255, 0)):
+##        self.start_terr.set_capitol()
         self.territories = all_terr
 
         # Place a supply center in one of the player's territories
-        while True:
-            index = random.randint(0, len(self.territories)-1)
-            if not self.territories[index].capitol: # Unless there is a capitol
-                self.territories[index].set_supply()
-                break
+##        while True:
+##            index = random.randint(0, len(self.territories)-1)
+##            if not self.territories[index].capitol: # Unless there is a capitol
+##                self.territories[index].set_supply()
+##                break
+        big1 = big2 = None
+        for i in self.territories:
+            if not big1:
+                big1 = i
+                continue
+            if not big2:
+                if len(i.terr) > len(big1.terr):
+                    big2 = big1
+                    big1 = i
+                else:
+                    big2 = i
+                continue
 
-        num_troops = len(self.territories)
+            if len(i.terr) > len(big1.terr):
+                big2 = big1
+                big1 = i
+            elif len(i.terr) > len(big2.terr):
+                big2 = i
+        big1.set_capitol()
+        big2.set_supply()
+
+        num_troops = len(self.territories) - 2
         while num_troops:
             for i in self.territories:
                 if not i.capitol or i.supply:

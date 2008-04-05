@@ -49,7 +49,7 @@ def make_map_players(world, num_players=2):
     for i in xrange(num_players):
         new = random.choice(pterr)
         pterr.remove(new)
-        players.append([new, [new], colors[i]])
+        players.append([[new], colors[i]])
 
     
 
@@ -58,11 +58,11 @@ def make_map_players(world, num_players=2):
             if pterr:
                 new = random.choice(pterr)
                 pterr.remove(new)
-                i[1].append(new)
+                i[0].append(new)
 
     ret = []
     for i in players:
-        ret.append(Player(i[0], i[1], i[2]))
+        ret.append(Player(i[0], i[1]))
         
 
     world.players = ret
