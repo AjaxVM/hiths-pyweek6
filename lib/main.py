@@ -78,6 +78,8 @@ def game(screen, myConfig):
     world_height = round(screen_size[1]*0.666) # World uses 2/3 of the screen
 
     app = gui.App(screen, background_color=None)
+    aapp = gui.App(screen, background_color = None)
+    aapp.always_render = True
     app.theme = gui.make_theme(os.path.join("data", "gui"))
     app.always_render = True
     end_turn_button = gui.Button(app, (-1, screen_size[1]), "End Turn", "End Turn",
@@ -122,6 +124,11 @@ def game(screen, myConfig):
 
     pad_height = pad_up_button.image.get_height()
     pad_width = pad_left_button.image.get_width()
+
+    aleft = wui.Arrow(aapp, (1, int(world_height/2)), "ArrowLeft", "left")
+    aright = wui.Arrow(aapp, (screen_size[0]-16, int(world_height/2)), "ArrowRight", "right")
+    aup = wui.Arrow(aapp, (int(screen_size[0]/2), 1), "ArrowUp", "up")
+    adown = wui.Arrow(aapp, (int(screen_size[0]/2), world_height-16), "ArrowDown", "down")
 
 
     world_screen = screen.subsurface((pad_width,
@@ -392,6 +399,7 @@ def game(screen, myConfig):
             world.offset[0] += SCROLL_SPEED
 
         app.render()
+        aapp.render()
         pygame.display.flip()
         if not controllers[whos_turn] == "human":
             time.sleep(0.1)

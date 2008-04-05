@@ -27,6 +27,20 @@ class CheckBox(object):
             if event.action == gui.GUI_EVENT_CLICK:
                 self.toggle()
 
+class Arrow(gui.Widget):
+    def __init__(self, parent, pos, name,
+                 arrow="up"):
+        gui.Widget.__init__(self, parent, pos, name, "center", None)
+
+        self.over_width = None
+
+        self.image = pygame.image.load(os.path.join("data", "gui", "arrow_%s.png"%arrow)).convert_alpha()
+
+    def render(self, surface):
+        self.rect.center = self.pos
+        surface.blit(self.image, self.rect.topleft)
+        return None
+
 def get_username(screen):
     app = gui.App(pygame.Surface(screen.get_size()))
     app.theme = gui.make_theme(os.path.join("data", "gui"))
