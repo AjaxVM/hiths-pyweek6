@@ -278,9 +278,13 @@ class World(object):
         self.map_size = ()
 
         if self.background:
-            self.use_bg = pygame.transform.scale(self.background,
-                                             (self.tile_size[0]*len(self.grid.grid[0]),
-                                              self.tile_size[1]*len(self.grid.grid)))
+            x = self.tile_size[0]*len(self.grid.grid[0])
+            y = self.tile_size[1]*len(self.grid.grid)
+            if x < self.display.get_width():
+                x = self.display.get_width()
+            if y < self.display.get_height():
+                y = self.display.get_height()
+            self.use_bg = pygame.transform.scale(self.background, (x, y))
 
         self.__images = {}
         self.__use_images = {}
@@ -340,15 +344,16 @@ class World(object):
         dx, dy = self.offset
 
         if not self.world_image:
-            self.world_image = pygame.Surface(self.map_size)
+            self.world_image = pygame.Surface((self.map_size[0],
+                                               self.map_size[1]+self.tile_size[1])).convert_alpha()
             if self.background:
-                self.world_image.blit(self.use_bg, (0,0))
+                self.world_image.fill((0,0,0,0))
             else:
                 self.world_image.fill((255,255,255))
             for x in self.players:
                 for i in x.territories:
                     for s in i.terr: #render territories
-                        r = (s[0] * tx, s[1] * ty,
+                        r = (s[0] * tx, s[1] * ty+self.tile_size[1],
                              tx, ty)
                         pygame.draw.rect(self.world_image, x.color, r)
                     for s in i.terr_points: #render borders
@@ -358,18 +363,26 @@ class World(object):
                             amt=1
                         pygame.draw.line(self.world_image, [0,0,0],
                                          [s[0][0]*self.tile_size[0],
-                                          s[0][1]*self.tile_size[1]],
+                                          s[0][1]*self.tile_size[1]+self.tile_size[1]],
                                          [s[1][0]*self.tile_size[0],
-                                          s[1][1]*self.tile_size[1]],
+                                          s[1][1]*self.tile_size[1]+self.tile_size[1]],
                                          amt)
             for x in self.players:
                 for i in x.territories:
                     for s in i.actors:
                         img = self.get_image(s.image)
                         r = img.get_rect()
-                        r.bottomleft = (s.pos[0] * tx, (s.pos[1]+1) * ty)
+                        r.bottomleft = (s.pos[0] * tx, (s.pos[1]+1) * ty+self.tile_size[1])
                         self.world_image.blit(img, r.topleft) 
 
+        if self.background:
+            x = -dx
+            y = -dy
+            if x > 0:
+                x = 0
+            if y > 0:
+                y = 0
+            self.display.blit(self.use_bg, (x, y))
         self.display.blit(self.world_image, (-dx, -dy))
 
     def get_mouse_pos(self):
@@ -400,9 +413,14 @@ class World(object):
             self.__use_images[i] = pygame.transform.scale(self.__images[i], (self.tile_size[0],
                                                                              self.tile_size[1]*2))
         if self.background:
-            self.use_bg = pygame.transform.scale(self.background,
-                                             (self.tile_size[0]*len(self.grid.grid[0]),
-                                              self.tile_size[1]*len(self.grid.grid)))
+            #image must be as big as the display!
+            x = self.tile_size[0]*len(self.grid.grid[0])
+            y = self.tile_size[1]*len(self.grid.grid)
+            if x < self.display.get_width():
+                x = self.display.get_width()
+            if y < self.display.get_height():
+                y = self.display.get_height()
+            self.use_bg = pygame.transform.scale(self.background, (x, y))
 
     def get_biggest_player(self):
         cur = None
