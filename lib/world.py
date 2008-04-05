@@ -337,6 +337,8 @@ class World(object):
 
     def get_mouse_pos(self):
         p = pygame.mouse.get_pos()
+        x = self.display.get_offset()
+        p = p[0] - x[0], p[1] - x[1]
 
         self.__fix_offset()
 
