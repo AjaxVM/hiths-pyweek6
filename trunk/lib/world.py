@@ -277,6 +277,11 @@ class World(object):
         self.offset = [0,0]
         self.map_size = ()
 
+        if self.background:
+            self.use_bg = pygame.transform.scale(self.background,
+                                             (self.tile_size[0]*len(self.grid.grid[0]),
+                                              self.tile_size[1]*len(self.grid.grid)))
+
         self.__images = {}
         self.__use_images = {}
 
@@ -325,9 +330,6 @@ class World(object):
         if not self.__use_images:
             self.__use_images = self.__images
 
-        if self.background:
-            self.display.blit(self.background, (0,0))
-
         img = self.__use_images
 
 
@@ -337,11 +339,12 @@ class World(object):
 
         dx, dy = self.offset
 
-        self.display.fill((255,255,255))
-
         if not self.world_image:
             self.world_image = pygame.Surface(self.map_size)
-            self.world_image.fill((255,255,255))
+            if self.background:
+                self.world_image.blit(self.use_bg, (0,0))
+            else:
+                self.world_image.fill((255,255,255))
             for x in self.players:
                 for i in x.territories:
                     for s in i.terr: #render territories
@@ -396,6 +399,10 @@ class World(object):
         for i in self.__images:
             self.__use_images[i] = pygame.transform.scale(self.__images[i], (self.tile_size[0],
                                                                              self.tile_size[1]*2))
+        if self.background:
+            self.use_bg = pygame.transform.scale(self.background,
+                                             (self.tile_size[0]*len(self.grid.grid[0]),
+                                              self.tile_size[1]*len(self.grid.grid)))
 
     def get_biggest_player(self):
         cur = None

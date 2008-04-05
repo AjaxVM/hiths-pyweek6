@@ -135,7 +135,8 @@ def game(screen, myConfig):
                                       pad_height,
                                       screen_size[0]-pad_width*2,
                                       world_height-pad_height*2))
-    world = World(world_screen, map_grid=mg)
+    world = World(world_screen, map_grid=mg,
+                  background=pygame.image.load(os.path.join("data", "images", "bg1.png")).convert())
     controllers = make_map_players(world)
 
     if myConfig.music:
