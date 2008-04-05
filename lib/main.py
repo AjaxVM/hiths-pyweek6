@@ -68,7 +68,7 @@ def make_map_players(world, num_players=2):
     world.players = ret
     world.update()
 
-def game(screen):
+def game(screen, myConfig):
     screen_size = screen.get_size()
     world_height = round(screen_size[1]*0.666) # World uses 2/3 of the screen
 
@@ -235,7 +235,14 @@ def game(screen):
                    util.connected_mass(picktwo[0][1].terr, picktwo[1][1].terr):
                     if not picktwo[0][0] == picktwo[1][0]:
                         if picktwo[0][1].can_move:
-                            if wui.do_battle(screen, picktwo, world):
+                            if myConfig.attack_dialog:
+                                a = wui.do_battle(screen, picktwo, world)
+                                if a[1]: #don't do again!
+                                    myConfig.attack_dialog = 0
+                                a = a[0]
+                            else:
+                                a = True
+                            if a:
                                 x, y = rules.perform_battle(picktwo[0][1], picktwo[1][1])
                                 picktwo[0][1].units -= x
                                 picktwo[1][1].units -= y
@@ -266,7 +273,14 @@ def game(screen):
                     else:
                         print "player territories - moving units"
                         if picktwo[0][1].can_move:
-                            if wui.move_troops(screen, picktwo, world):
+                            if myConfig.move_dialog:
+                                a = wui.move_troops(screen, picktwo, world)
+                                if a[1]: #don't do again!
+                                    myConfig.move_dialog = 0
+                                a = a[0]
+                            else:
+                                a = True
+                            if a:
                                 x = picktwo[0][1].units - 1
                                 if picktwo[1][1].max_units >= picktwo[1][1].units + x:
                                     pass
@@ -328,10 +342,11 @@ def game(screen):
         pygame.display.flip()
 
 def main():
+    myConfig = config.Config()
     pygame.init()
-    screen_size = (640, 480)
+    screen_size = (myConfig.screen_width, myConfig.screen_height)
     screen = pygame.display.set_mode(screen_size)
 
     uname = wui.get_username(screen)
 
-    game(screen)
+    game(screen, myConfig)

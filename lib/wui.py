@@ -5,6 +5,28 @@ from pygame.locals import *
 
 import gui, rules
 
+class CheckBox(object):
+    def __init__(self, parent, pos, name, widget_pos="topleft"):
+        self.button = gui.Button(parent, pos, name, "X", widget_pos)
+        self.button.over_width = self.button.image.get_width()
+        self.button.over_height = self.button.image.get_height()
+        self.state = True
+
+        self.toggle()
+
+    def toggle(self):
+        self.state = not self.state
+        if self.state:
+            self.button.text = "X"
+        else:
+            self.button.text = " "
+        self.button.make_image()
+
+    def event(self, event):
+        if event.name == self.button.name:
+            if event.action == gui.GUI_EVENT_CLICK:
+                self.toggle()
+
 def get_username(screen):
     app = gui.App(pygame.Surface(screen.get_size()))
     app.theme = gui.make_theme(os.path.join("data", "gui"))
@@ -90,6 +112,12 @@ def do_battle(screen, picktwo, world):
     cancel_button = gui.Button(main_win, (-1, 260), "CANCEL", "Cancel",
                                widget_pos="bottomleft")
 
+    do_again = CheckBox(main_win, (300, 0), "CB1", "topright")
+    dal = gui.Label(main_win, (300-do_again.button.over_width,
+                               do_again.button.over_height),
+                    "DALabel", "Don't show again: ",
+                    widget_pos="bottomright")
+
     while 1:
         for event in app.get_events():
             if event.type == QUIT:
@@ -98,10 +126,11 @@ def do_battle(screen, picktwo, world):
             if event.type == gui.GUI_EVENT:
                 if event.name == "MainWindow":
                     event = event.subevent
+                    do_again.event(event)
                     if event.name == "ATTACK" and event.action == gui.GUI_EVENT_CLICK:
-                        return True
+                        return True, do_again.state
                     if event.name == "CANCEL" and event.action == gui.GUI_EVENT_CLICK:
-                        return False
+                        return False, do_again.state
 
         screen.blit(bg, (0,0))
         screen.blit(app.render(), (0,0))
@@ -141,6 +170,12 @@ def move_troops(screen, picktwo, world):
     cancel_button = gui.Button(main_win, (-1, 260), "CANCEL", "Cancel",
                                widget_pos="bottomleft")
 
+    do_again = CheckBox(main_win, (300, 0), "CB1", "topright")
+    dal = gui.Label(main_win, (300-do_again.button.over_width,
+                               do_again.button.over_height),
+                    "DALabel", "Don't show again: ",
+                    widget_pos="bottomright")
+
     while 1:
         for event in app.get_events():
             if event.type == QUIT:
@@ -149,10 +184,11 @@ def move_troops(screen, picktwo, world):
             if event.type == gui.GUI_EVENT:
                 if event.name == "MainWindow":
                     event = event.subevent
+                    do_again.event(event)
                     if event.name == "TRANSFER" and event.action == gui.GUI_EVENT_CLICK:
-                        return True
+                        return True, do_again.state
                     if event.name == "CANCEL" and event.action == gui.GUI_EVENT_CLICK:
-                        return False
+                        return False, do_again.state
 
         screen.blit(bg, (0,0))
         screen.blit(app.render(), (0,0))
