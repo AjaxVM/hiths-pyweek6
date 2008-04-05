@@ -312,8 +312,8 @@ class World(object):
 
         if self.offset[1] < 0:
             self.offset[1] = 0
-        if self.offset[1] > self.tile_size[1] * len(self.grid.grid) - self.display.get_height():
-            self.offset[1] = self.tile_size[1] * len(self.grid.grid) - self.display.get_height()
+        if self.offset[1] > self.tile_size[1] * len(self.grid.grid) - self.display.get_height() + self.tile_size[1]:
+            self.offset[1] = self.tile_size[1] * len(self.grid.grid) - self.display.get_height() + self.tile_size[1]
         pass
 
     def get_image(self, name):
