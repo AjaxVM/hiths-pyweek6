@@ -136,6 +136,9 @@ def game(screen):
 
     clock = pygame.time.Clock()
 
+    zoom_states = [(10, 5), (20, 10), (40, 20), (80, 40)]
+    zoom_state = 3
+
     while 1:
         clock.tick(600)
         if not pygame.time.get_ticks() % 10:
@@ -174,15 +177,14 @@ def game(screen):
                         print "clicked player #%ss territory: %s"%(x[0]+1, x[1])
                         picktwo.append(x)
                 if event.button == 4:
-                    #zoom in
-                    world.tile_size = [world.tile_size[0] * 2,
-                                       world.tile_size[1] * 2]
-                    world.update()
+                    if zoom_state < 3:
+                        zoom_state += 1
+                        world.tile_size = zoom_states[zoom_state]
+                        world.update()
                 if event.button == 5:
-                    #zoom out
-                    if world.tile_size[1] >= 5:
-                        world.tile_size = [int(world.tile_size[0] / 2),
-                                           int(world.tile_size[1] / 2)]
+                    if zoom_state > 0:
+                        zoom_state -= 1
+                        world.tile_size = zoom_states[zoom_state]
                         world.update()
 
             if event.type == gui.GUI_EVENT:
