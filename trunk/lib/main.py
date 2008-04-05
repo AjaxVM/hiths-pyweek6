@@ -68,15 +68,9 @@ def make_map_players(world, num_players=2):
     world.players = ret
     world.update()
 
-##if sys.platform == "win32":
-##    pygame.mixer.pre_init(44100,-16,2, 1024)
-##if sys.platform == "linux2":
-##    pygame.mixer.pre_init(44100, -16, 2, 2048)
-
 def game(screen):
     screen_size = screen.get_size()
     world_height = round(screen_size[1]*0.666) # World uses 2/3 of the screen
-    world_screen = screen.subsurface((0, 0, screen_size[0], world_height))
 
     app = gui.App(screen, background_color=None)
     app.theme = gui.make_theme(os.path.join("data", "gui"))
@@ -95,6 +89,39 @@ def game(screen):
 
     mg = MapGrid(util.make_random_map())
 
+    pad_up_button = gui.Button(app, (0, 0), "PAD_UP_BUTTON", "",
+                               widget_pos="topleft")
+    pad_up_button.over_width = screen_size[0]
+    pad_up_button.over_height = 15
+    pad_up_button.make_image()
+
+    pad_down_button = gui.Button(app, (0, world_height), "PAD_DOWN_BUTTON", "",
+                               widget_pos="bottomleft")
+    pad_down_button.over_width = screen_size[0]
+    pad_down_button.over_height = 15
+    pad_down_button.make_image()
+
+
+    pad_left_button = gui.Button(app, (0, pad_up_button.image.get_height()), "PAD_LEFT_BUTTON", "",
+                               widget_pos="topleft")
+    pad_left_button.over_width = 15
+    pad_left_button.over_height = world_height - pad_up_button.image.get_height()*2
+    pad_left_button.make_image()
+
+    pad_right_button = gui.Button(app, (screen_size[0], pad_up_button.image.get_height()), "PAD_RIGHT_BUTTON", "",
+                               widget_pos="topright")
+    pad_right_button.over_width = 15
+    pad_right_button.over_height = world_height - pad_up_button.image.get_height()*2
+    pad_right_button.make_image()
+
+    pad_height = pad_up_button.image.get_height()
+    pad_width = pad_left_button.image.get_width()
+
+
+    world_screen = screen.subsurface((pad_width,
+                                      pad_height,
+                                      screen_size[0]-pad_width*2,
+                                      world_height-pad_height*2))
     world = World(world_screen, map_grid=mg)
     make_map_players(world)
 
@@ -159,16 +186,17 @@ def game(screen):
                         world.update()
 
             if event.type == gui.GUI_EVENT:
-                if event.widget == gui.Button and event.name == "End Turn":
-                    if event.action == gui.GUI_EVENT_CLICK:
-                        world.players[whos_turn].end_turn()
-                        whos_turn += 1
-                        if whos_turn >= len(world.players):
-                            whos_turn = 0
-                        whos_turn_label.text = "It is player %ss turn"%(whos_turn+1)
-                        whos_turn_label.theme.label["text-color"] = world.players[whos_turn].color
-                        whos_turn_label.make_image()
-                        world.update()
+                if event.widget == gui.Button:
+                    if event.name == "End Turn":
+                        if event.action == gui.GUI_EVENT_CLICK:
+                            world.players[whos_turn].end_turn()
+                            whos_turn += 1
+                            if whos_turn >= len(world.players):
+                                whos_turn = 0
+                            whos_turn_label.text = "It is player %ss turn"%(whos_turn+1)
+                            whos_turn_label.theme.label["text-color"] = world.players[whos_turn].color
+                            whos_turn_label.make_image()
+                            world.update()
 
         if world.players[whos_turn].dead:
             whos_turn += 1
@@ -256,26 +284,35 @@ def game(screen):
         screen.fill((0,0,0))
         world.render()
 
-        mpos = pygame.mouse.get_pos()
-
-        if mpos[0] <= SCROLL_ZONE or K_LEFT in keys_down:
+        if pad_up_button.is_clicked():
+            world.offset[1] -= SCROLL_SPEED
+        if pad_down_button.is_clicked():
+            world.offset[1] += SCROLL_SPEED
+        if pad_left_button.is_clicked():
             world.offset[0] -= SCROLL_SPEED
-        if mpos[0] >= screen_size[0] - SCROLL_ZONE or K_RIGHT in keys_down:
+        if pad_right_button.is_clicked():
             world.offset[0] += SCROLL_SPEED
 
-        if mpos[1] <= SCROLL_ZONE or K_UP in keys_down:
-            world.offset[1] -= SCROLL_SPEED
-        if (mpos[1] >= world_height - SCROLL_ZONE and not mpos[1] > world_height) \
-            or K_DOWN in keys_down:
-            world.offset[1] += SCROLL_SPEED
-
-        if not mpos[1] > world_height: # Don't draw rect over the interface area
-            pos = world.get_mouse_pos()
-            pygame.draw.rect(screen, (255,255,255),
-                             (pos[0] * world.tile_size[0] - world.offset[0],
-                              pos[1] * world.tile_size[1] - world.offset[1],
-                              world.tile_size[0], world.tile_size[1]),
-                             1)
+##        mpos = pygame.mouse.get_pos()
+##
+##        if mpos[0] <= SCROLL_ZONE or K_LEFT in keys_down:
+##            world.offset[0] -= SCROLL_SPEED
+##        if mpos[0] >= screen_size[0] - SCROLL_ZONE or K_RIGHT in keys_down:
+##            world.offset[0] += SCROLL_SPEED
+##
+##        if mpos[1] <= SCROLL_ZONE or K_UP in keys_down:
+##            world.offset[1] -= SCROLL_SPEED
+##        if (mpos[1] >= world_height - SCROLL_ZONE and not mpos[1] > world_height) \
+##            or K_DOWN in keys_down:
+##            world.offset[1] += SCROLL_SPEED
+##
+##        if not mpos[1] > world_height: # Don't draw rect over the interface area
+##            pos = world.get_mouse_pos()
+##            pygame.draw.rect(screen, (255,255,255),
+##                             (pos[0] * world.tile_size[0] - world.offset[0] + pad_width,
+##                              pos[1] * world.tile_size[1] - world.offset[1] + pad_height,
+##                              world.tile_size[0], world.tile_size[1]),
+##                             1)
 
         app.render()
         pygame.display.flip()

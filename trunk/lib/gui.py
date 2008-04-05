@@ -262,6 +262,9 @@ class Button(Widget):
         self.change_image(self.regular)
         self.__mouse_hold_me = False
 
+    def is_clicked(self):
+        return self.__mouse_hold_me
+
     def make_image(self):
         if self.theme and self.theme.font["font"]:
             font = pygame.font.Font(self.theme.font["font"],
