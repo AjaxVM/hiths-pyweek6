@@ -302,14 +302,17 @@ def Options(screen, myConfig):
 ##    for i in ["screen_height", "screen_width", "sound_volume"]:
 ##        pass
 
-    screendim = gui.MenuList(app, (screen.get_width(), 60), "ScreenDim",
+    sdlabel = gui.Label(app, (screen.get_width(), 60),
+                        "SDLabel", "display:",
+                        widget_pos="topright")
+    screendim = gui.MenuList(app, sdlabel.rect.bottomright, "ScreenDim",
                          ["640x480", "800x600", "1024x768"],
                          widget_pos="topright")
 
     vlabel = gui.Label(app, (screen.get_width(), screendim.rect.bottom + 15),
-                       "sound_volume", "sound_volume", widget_pos="topright")
-    vbar = gui.ScrollBar(app, vlabel.rect.bottomleft,
-                         "SV_bar", widget_pos="topleft",
+                       "sound_volume", "sound_volume:", widget_pos="topright")
+    vbar = gui.ScrollBar(app, vlabel.rect.bottomright,
+                         "SV_bar", widget_pos="topright",
                          tot_size=[10000, 10], view_size=[100, 10],
                          start_value=0, direction=0)
     vbar.current_value = myConfig.sound_volume * 0.7
@@ -329,7 +332,7 @@ def Options(screen, myConfig):
                             if i.state:
                                 s = 1
                             setattr(myConfig, i.name, s)
-                        setattr(myConfig, "sound_volume", vbar.current_value * 1.4)
+                        setattr(myConfig, "sound_volume", int(vbar.current_value * 1.4))
                         myConfig.save_settings()
                         return "MainMenu"
                 if event.name == "ScreenDim":
