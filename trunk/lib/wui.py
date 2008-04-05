@@ -309,17 +309,25 @@ def Options(screen, myConfig):
     for i in ["fullscreen", "music", "fps_counter",
               "attack_dialog", "move_dialog", "new_unit_dialog"]:
         if not entries:
-            new = gui.Label(app, (15, 60), i, i,
+            if i.find("dialog") != -1:
+                x = "disable " + i
+            else:
+                x = i
+            new = gui.Label(app, (15, 60), i, x,
                             widget_pos="topleft")
             entries.append(new)
-            do_again = CheckBox(app, (300, 55), i, "topright")
+            do_again = CheckBox(app, (375, 55), i, "topright")
             do_again.set_state(getattr(myConfig, i))
             boxes.append(do_again)
         else:
-            new = gui.Label(app, (15, entries[-1].rect.bottom+15), i, i,
+            if i.find("dialog") != -1:
+                x = "disable " + i
+            else:
+                x = i
+            new = gui.Label(app, (15, entries[-1].rect.bottom+15), i, x,
                             widget_pos="topleft")
             entries.append(new)
-            do_again = CheckBox(app, (300, entries[-2].rect.bottom+10), i, "topright")
+            do_again = CheckBox(app, (375, entries[-2].rect.bottom+10), i, "topright")
             do_again.set_state(getattr(myConfig, i))
             boxes.append(do_again)
 
@@ -329,14 +337,14 @@ def Options(screen, myConfig):
         sfx_select.set_volume(myConfig.sound_volume*0.02) 
 
     sdlabel = gui.Label(app, (screen.get_width(), 60),
-                        "SDLabel", "display:",
+                        "SDLabel", "display: ",
                         widget_pos="topright")
     screendim = gui.MenuList(app, sdlabel.rect.bottomright, "ScreenDim",
                          ["640x480", "800x600", "1024x768"],
                          widget_pos="topright")
 
     vlabel = gui.Label(app, (screen.get_width(), screendim.rect.bottom + 15),
-                       "sound_volume", "sound_volume:", widget_pos="topright")
+                       "sound_volume", "sound_volume: ", widget_pos="topright")
     vbar = gui.ScrollBar(app, vlabel.rect.bottomright,
                          "SV_bar", widget_pos="topright",
                          tot_size=[10000, 10], view_size=[100, 10],
