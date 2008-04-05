@@ -191,6 +191,11 @@ def game(screen, myConfig):
                 if event.widget == gui.Button:
                     if event.name == "End Turn":
                         if event.action == gui.GUI_EVENT_CLICK:
+                            if myConfig.new_unit_dialog:
+                                a = wui.gain_troops(screen, world.players[whos_turn])
+                                if a[1]: #don't do again!
+                                    myConfig.new_unit_dialog = 0
+                                    myConfig.save_settings()
                             world.players[whos_turn].end_turn()
                             whos_turn += 1
                             if whos_turn >= len(world.players):
@@ -239,6 +244,7 @@ def game(screen, myConfig):
                                 a = wui.do_battle(screen, picktwo, world)
                                 if a[1]: #don't do again!
                                     myConfig.attack_dialog = 0
+                                    myConfig.save_settings()
                                 a = a[0]
                             else:
                                 a = True
@@ -277,6 +283,7 @@ def game(screen, myConfig):
                                 a = wui.move_troops(screen, picktwo, world)
                                 if a[1]: #don't do again!
                                     myConfig.move_dialog = 0
+                                    myConfig.save_settings()
                                 a = a[0]
                             else:
                                 a = True

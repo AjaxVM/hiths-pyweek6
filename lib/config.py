@@ -16,10 +16,6 @@ class Config(object):
         self.make_file()
         self.open_settings()
 
-    def __setattr__(self, x, y):
-        object.__setattr__(self, x, y)
-        self.save_settings()
-
     def make_file(self):
         """makes a new config file if there isn't one yet."""
         fname = os.path.join("data", "config.txt")
