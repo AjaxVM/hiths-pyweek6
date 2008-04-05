@@ -10,7 +10,14 @@ class Config(object):
         self.music = 1
         self.sfx = 1
         self.fps_counter = 1
+        self.make_file()
         self.open_settings()
+
+    def make_file(self):
+        """makes a new config file if there isn't one yet."""
+        fname = os.path.join("data", "config.py")
+        if not os.path.exists(fname):
+            self.save_settings()
 
     def save_settings(self):
         """Saves current settings to the file to be read on start: settings.py"""
@@ -29,6 +36,8 @@ class Config(object):
         a = open(fname, "rU").read()
 
         for line in a.split("\n"):
-            if line:
-                a, b = line.split(" = ")
+            if line and not line.startswith("#"):
+                a, b = line.split("=")
+                a = a.split()[0]
+                b = b.split()[0]
                 setattr(self, a, int(b))
