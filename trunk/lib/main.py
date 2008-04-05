@@ -491,6 +491,14 @@ def main():
                 goto = "Game"
             if a == "Options":
                 goto = a
+            if a == "Tut":
+                goto = "Tut"
+        if goto == "Tut":
+            a = wui.Tutorial(screen, myConfig)
+            if a == "QUIT":
+                pygame.quit()
+                return
+            goto = "MainMenu"
         if goto == "Game":
             c = wui.pre_single_game(screen, myConfig)
             if c == "QUIT":
