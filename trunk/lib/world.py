@@ -279,11 +279,11 @@ class World(object):
 
         if self.background:
             x = self.tile_size[0]*len(self.grid.grid[0])
-            y = self.tile_size[1]*len(self.grid.grid)
+            y = self.tile_size[1]*len(self.grid.grid)+self.tile_size[1]
             if x < self.display.get_width():
                 x = self.display.get_width()
-            if y < self.display.get_height():
-                y = self.display.get_height()
+            if y < self.display.get_height()+self.tile_size[1]:
+                y = self.display.get_height()+self.tile_size[1]
             self.use_bg = pygame.transform.scale(self.background, (x, y))
 
         self.__images = {}
@@ -415,11 +415,11 @@ class World(object):
         if self.background:
             #image must be as big as the display!
             x = self.tile_size[0]*len(self.grid.grid[0])
-            y = self.tile_size[1]*len(self.grid.grid)
+            y = self.tile_size[1]*len(self.grid.grid)+self.tile_size[1]
             if x < self.display.get_width():
                 x = self.display.get_width()
-            if y < self.display.get_height():
-                y = self.display.get_height()
+            if y < self.display.get_height()+self.tile_size[1]:
+                y = self.display.get_height()+self.tile_size[1]
             self.use_bg = pygame.transform.scale(self.background, (x, y))
 
     def get_biggest_player(self):
