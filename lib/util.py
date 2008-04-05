@@ -214,6 +214,18 @@ def split_terr(grid):
                 finished.append(i)
                 picked.remove(i)
 
+    bad = get_bad_territory(finished)
+    while bad:
+        exp = random.choice(bad)
+        new = get_random_adj2(exp, dim)
+        if new:
+            for i in finished:
+                for x in i:
+                    if x == new:
+                        i.remove(x)
+            bad.append(new)
+        bad = get_bad_territory(finished)
+
     cur = 0
     for i in finished:
         cur += 1
@@ -226,6 +238,26 @@ def split_terr(grid):
                 grid[y][x] = 0
 
     return grid
+
+def get_random_adj2(spot, dim):
+    available = []
+
+    for val in [[spot[0]-1, spot[1]],
+                [spot[0]+1, spot[1]],
+                [spot[0], spot[1]-1],
+                [spot[0], spot[1]+1]]:
+        if val[0] >= 0 and val[0] < dim[0]:
+            if val[1] >= 0 and val[1] < dim[1]:
+                available.append(val)
+    if available:
+        return random.choice(available)
+    return None
+
+def get_bad_territory(terr):
+    for i in terr:
+        if len(i) < 5:
+            return i
+    return None
 
 def get_territories(grid):
     terr = {}
