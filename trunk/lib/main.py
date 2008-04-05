@@ -73,7 +73,7 @@ def make_map_players(world, num_players=7, num_ai=6):
         controllers.append(ai.AI("AI-%s"%i, world))
     return controllers
 
-def game(screen, myConfig):
+def game(screen, myConfig, nump, numai):
     screen_size = screen.get_size()
     world_height = round(screen_size[1]*0.666) # World uses 2/3 of the screen
 
@@ -137,7 +137,7 @@ def game(screen, myConfig):
                                       world_height-pad_height*2))
     world = World(world_screen, map_grid=mg,
                   background=pygame.image.load(os.path.join("data", "images", "bg1.png")).convert())
-    controllers = make_map_players(world)
+    controllers = make_map_players(world, nump, numai)
     world_rect = world.display.get_rect()
     world_rect.topleft = world.display.get_offset()
 
@@ -175,11 +175,6 @@ def game(screen, myConfig):
                     a = "%s-%s-%s-%s"%(a[1], a[2], a[3], a[4])
                     pygame.image.save(screen, os.path.join("data", "screenshots",
                                                            "screenie %s.jpg"%a))
-
-                if event.key == K_SPACE:
-                    mg = MapGrid(util.make_random_map())
-                    world.grid = mg
-                    make_map_players(world)
 
                 if event.key == K_LEFT or K_RIGHT or K_UP or K_DOWN:
                     keys_down.add(event.key)
@@ -441,6 +436,8 @@ def main():
     pygame.init()
     screen = do_settings(myConfig)
 
+##    wui.pre_single_game(screen)
+
 ##    uname = wui.get_username(screen)
 
 ##    game(screen, myConfig)
@@ -457,7 +454,14 @@ def main():
             if a == "Options":
                 goto = a
         if goto == "Game":
-            a = game(screen, myConfig)
+            c = wui.pre_single_game(screen)
+            if c == "QUIT":
+                pygame.quit()
+                return
+            if c == "MainMenu":
+                goto = c
+                continue
+            a = game(screen, myConfig, c[1], c[2])
             if a == "QUIT":
                 pygame.quit()
                 return
