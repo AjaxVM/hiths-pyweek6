@@ -9,9 +9,16 @@ class Config(object):
         self.fullscreen = 0
         self.music = 1
         self.sfx = 1
-        self.fps_counter = 1
+        self.fps_counter = 0
+        self.attack_dialog = 1
+        self.move_dialog = 1
+        self.new_unit_dialog = 1
         self.make_file()
         self.open_settings()
+
+    def __setattr__(self, x, y):
+        object.__setattr__(self, x, y)
+        self.save_settings()
 
     def make_file(self):
         """makes a new config file if there isn't one yet."""
