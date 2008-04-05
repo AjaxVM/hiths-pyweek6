@@ -299,9 +299,6 @@ def Options(screen, myConfig):
             do_again.set_state(getattr(myConfig, i))
             boxes.append(do_again)
 
-##    for i in ["screen_height", "screen_width", "sound_volume"]:
-##        pass
-
     sdlabel = gui.Label(app, (screen.get_width(), 60),
                         "SDLabel", "display:",
                         widget_pos="topright")
@@ -382,6 +379,69 @@ def MainMenu(screen):
                 if event.name == "Exit":
                     if event.action == gui.GUI_EVENT_CLICK:
                         return "QUIT"
+
+        screen.blit(app.render(), (0,0))
+        pygame.display.flip()
+
+def pre_single_game(screen):
+    app = gui.App(pygame.Surface(screen.get_size()))
+    app.theme = gui.make_theme(os.path.join("data", "gui"))
+
+    ol = gui.Label(app, (-1, 0),
+                              "GNL", "Game Options:",
+                              widget_pos="midtop")
+    ol.theme.font["size"] = 45
+    ol.theme.label["text-color"] = (0, 255, 0)
+    ol.make_image()
+
+    start = gui.Button(app, screen.get_size(), "SG", "Begin Game",
+                           widget_pos="bottomright")
+    start.theme.font["size"] = 25
+    start.theme.button["text-color"] = (125, 255, 125)
+    start.make_image()
+
+    goback = gui.Button(app, start.rect.bottomleft, "GB", "Return",
+                           widget_pos="bottomright")
+
+    nump = gui.Label(app, (-1, -1),
+                        "NumP", "players: 7",
+                        widget_pos="midbottom")
+    nbar = gui.ScrollBar(app, nump.rect.midright,
+                         "NP_bar", widget_pos="midleft",
+                         tot_size=[700, 10], view_size=[100, 10],
+                         start_value=0, direction=0)
+    nbar.current_value = 7 * 10#yields 7
+    nbar.max_value = 70
+    nbar.min_value = 20
+
+    num_ai = gui.Label(app, (-1, -1),
+                       "AI", "ai players: 6", widget_pos="midtop")
+    vbar = gui.ScrollBar(app, num_ai.rect.midright,
+                         "NA_bar", widget_pos="midleft",
+                         tot_size=[700, 10], view_size=[100, 10],
+                         start_value=0, direction=0)
+    vbar.current_value = 6 * 10
+
+    while 1:
+        a = int(nbar.current_value/10)
+        b = int(vbar.current_value/10)
+        if b > a:
+            b = a
+            vbar.current_value = b*10
+        nump.text = "players: %s"%a
+        num_ai.text = "ai players: %s"%b
+        nump.make_image()
+        num_ai.make_image()
+        for event in app.get_events():
+            if event.type == QUIT:
+                return "QUIT"
+            if event.type == gui.GUI_EVENT:
+                if event.name == "GB":
+                    if event.action == gui.GUI_EVENT_CLICK:
+                        return "MainMenu"
+                if event.name == "SG":
+                    if event.action == gui.GUI_EVENT_CLICK:
+                        return "PlayGame", a, b
 
         screen.blit(app.render(), (0,0))
         pygame.display.flip()
