@@ -2,11 +2,18 @@ from twisted.spread import pb, jelly
 from twisted.internet import reactor
 
 import random
+import config
+
+conf = config.Config()
+
+MAX_PLAYERS = 2
+PLAYER_TIMEOUT = conf.player_timeout # default 60s
 
 class GameServer(pb.Root):
     def __init__(self, game_type="multi"):
         self.game_type = game_type
         self.players = []
+        self.play_order = []
 
         self._last_send_index = 0
 
@@ -28,7 +35,6 @@ class GameServer(pb.Root):
                 print "Sending to: " + i.name
         except pb.DeadReferenceError:
             print "Dropping dead reference to " + i.name
-            # TODO more efficient way of finishing list?
             self._last_send_index = self.players.index(i)
             self.remove_user(i)
             self.send_to_all(func, *data)
@@ -37,12 +43,18 @@ class GameServer(pb.Root):
 
     def remote_join(self, client, name):
         # Check for an empty slot
+        if len(self.players) >= MAX_PLAYERS:
+            client.callRemote("server_disconnect", "Game is full")
         # Check for a user with the same name
         for i in self.players:
             if name == i.name:
                 name += str(random.randint(100, 999))
-        print name, " joined the server!"
         self.players.append(CopyUser(client, name))
+
+        msg = name + " joined the game"
+        print msg
+        self.send_to_all("send_chat_msg", msg)
+
         # Resend the updated player list..
         self.send_to_all("send_players", self.players)
 
@@ -50,12 +62,16 @@ class GameServer(pb.Root):
         user = self.find_user(client)
         if user:
             self.remove_user(user)
-        print user.name, "left the game"
+        msg = user.name + " left the game"
+        print msg
+        self.send_to_all("send_chat_msg", msg)
 
     def remote_get_chat_msg(self, client, msg):
         user = self.find_user(client)
-        print "=", user.name, msg
-        self.send_to_all("send_chat_msg", user.name, msg)
+
+        msg = user.name + " said: " + msg
+        print msg
+        self.send_to_all("send_chat_msg", msg)
 
     def find_user(self, remote_ref):
         for i in self.players:
