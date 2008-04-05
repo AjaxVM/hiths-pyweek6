@@ -321,7 +321,7 @@ def game(screen):
 
 def main():
     pygame.init()
-    screen_size = (1024, 768)
+    screen_size = (640, 480)
     screen = pygame.display.set_mode(screen_size)
 
     uname = wui.get_username(screen)
