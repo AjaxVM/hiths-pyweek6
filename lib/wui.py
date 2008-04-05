@@ -399,7 +399,10 @@ def MainMenu(screen, myConfig):
     play_game.theme.button["text-color"] = (125, 255, 125)
     play_game.make_image()
 
-    optionsb = gui.Button(app, play_game.rect.midbottom, "OB", "Options",
+    tutb = gui.Button(app, play_game.rect.midbottom, "TUT", "Instructions",
+                           widget_pos="midtop")
+
+    optionsb = gui.Button(app, tutb.rect.midbottom, "OB", "Options",
                            widget_pos="midtop")
 
     exit_game = gui.Button(app, optionsb.rect.midbottom, "Exit", "Exit",
@@ -427,6 +430,8 @@ def MainMenu(screen, myConfig):
                 if event.name == "Exit":
                     if event.action == gui.GUI_EVENT_CLICK:
                         return "QUIT"
+                if event.name == "TUT":
+                    return "Tut"
 
         screen.blit(app.render(), (0,0))
         pygame.display.flip()
@@ -607,5 +612,54 @@ def win_screen(screen, world, myConfig):
                         return event.name
 
         screen.blit(bg, (0,0))
+        screen.blit(app.render(), (0,0))
+        pygame.display.flip()
+
+
+def Tutorial(screen, myConfig):
+    i1 = pygame.transform.scale(pygame.image.load(os.path.join("data", "images", "tut1.png")),
+                                screen.get_size())
+    i2 = pygame.transform.scale(pygame.image.load(os.path.join("data", "images", "tut2.png")),
+                                screen.get_size())
+    cur = 0
+    cim = i1
+    app = gui.App(pygame.Surface(screen.get_size()).convert_alpha(), background_color=(0,0,0,0))
+    app.theme = gui.make_theme(os.path.join("data", "gui"))
+
+    next = gui.Button(app, screen.get_size(), "Next", "Next",
+                           widget_pos="bottomright")
+    next.theme.font["size"] = 25
+    next.theme.button["text-color"] = (125, 255, 125)
+    next.make_image()
+
+    retb = gui.Button(app, (0, screen.get_height()), "Back", "Back",
+                           widget_pos="bottomleft")
+
+    if myConfig.music:
+        sfx_select = pygame.mixer.Sound(os.path.join("data", "sfx", "select.ogg"))
+
+        sfx_select.set_volume(myConfig.sound_volume*0.02) 
+
+    while 1:
+        for event in app.get_events():
+            if event.type == QUIT:
+                return "QUIT"
+            if event.type == gui.GUI_EVENT:
+                if event.widget == gui.Button:
+                    if myConfig.music:
+                        sfx_select.play()
+                if event.name == "Next":
+                    if event.action == gui.GUI_EVENT_CLICK:
+                        if cur == 0:
+                            cur = 1
+                            cim = i2
+                        else:
+                            cur = 0
+                            cim = i1
+                if event.name == "Back":
+                    if event.action == gui.GUI_EVENT_CLICK:
+                        return "MainMenu"
+
+        screen.blit(cim, (0,0))
         screen.blit(app.render(), (0,0))
         pygame.display.flip()
