@@ -236,7 +236,7 @@ class Player(object):
 
 
 class World(object):
-    def __init__(self, surface, tile_size=(10, 7),
+    def __init__(self, surface, tile_size=(80, 40),
                  map_grid=None, background=None):
 
         self.tile_size = tile_size
@@ -251,6 +251,7 @@ class World(object):
         self.map_size = ()
 
         self.__images = {}
+        self.__use_images = {}
 
         self.players = []
 
@@ -282,7 +283,10 @@ class World(object):
     def get_image(self, name):
         if not name in self.__images:
             self.__images[name] = pygame.image.load(name).convert_alpha()
-        return self.__images[name]
+            self.__use_images[name] = self.__images[name]
+        if not self.__use_images:
+            self.__use_images = self.__images
+        return self.__use_images[name]
 
     def render(self):
         if self.map_size == () or self.world_image == None:
@@ -291,10 +295,13 @@ class World(object):
             y *= self.tile_size[1]
             self.map_size = x, y
 
+        if not self.__use_images:
+            self.__use_images = self.__images
+
         if self.background:
             self.display.blit(self.background, (0,0))
 
-        img = self.__images
+        img = self.__use_images
 
 
         tx, ty = self.tile_size
@@ -358,7 +365,10 @@ class World(object):
 
     def update(self):
         self.world_image = None
-            
+        self.__use_images = {}
+        for i in self.__images:
+            self.__use_images[i] = pygame.transform.scale(self.__images[i], (self.tile_size[0],
+                                                                             self.tile_size[1]*2))
 
         
 
