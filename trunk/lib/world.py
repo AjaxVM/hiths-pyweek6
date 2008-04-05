@@ -397,6 +397,17 @@ class World(object):
             self.__use_images[i] = pygame.transform.scale(self.__images[i], (self.tile_size[0],
                                                                              self.tile_size[1]*2))
 
+    def get_biggest_player(self):
+        cur = None
+        for i in self.players:
+            if not i.dead:
+                if not cur:
+                    cur = i
+                else:
+                    if len(i.territories) > len(cur.territories):
+                        cur = i
+        return cur
+
         
 
         

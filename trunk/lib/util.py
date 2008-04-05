@@ -327,3 +327,54 @@ def get_points(terr):
         if not is_border_touching_two(i, terr):
             new.append(i[1])
     return new
+
+def get_nearest_weakest(terr1, aterr, favor=None):
+    touching = []
+    for i in aterr.comp_terrs:
+        if (not terr1 == i) and (terr1.player != i.player): #this is only for attacking!
+            if connected_mass(terr1.terr, i.terr):
+                touching.append(i)
+
+    weakest = None
+    for i in touching:
+        if favor:
+            if not weakest:
+                weakest = i
+            else:
+                if (i.units < weakest.units and\
+                    (i.player == favor or not weakest.player == favor)) or\
+                    (i.player == favor and i.units < terr1.units and not weakest.player == favor):
+                    weakest = i
+        else:
+            if not weakest:
+                weakest = i
+            else:
+                if i.units < weakest.units:
+                    weakest = i
+    return weakest
+
+def get_enemies_touching(terr1, aterr):
+    touching = []
+    for i in aterr.comp_terrs:
+        if (not terr1 == i) and (terr1.player != i.player): #this is only for attacking!
+            if connected_mass(terr1.terr, i.terr):
+                touching.append(i)
+
+    return touching
+
+def get_friendlies_touching(terr1, aterr):
+    touching = []
+    for i in aterr.comp_terrs:
+        if (not terr1 == i) and (terr1.player == i.player): #this is only for attacking!
+            if connected_mass(terr1.terr, i.terr):
+                touching.append(i)
+
+    return touching
+
+def get_nearest_to_enemy(terr1, aterr):
+    if get_enemies_touching(terr1, aterr):
+        return terr1
+    for i in get_friendlies_touching(terr1, aterr):
+        if get_enemies_touching(i, aterr):
+            return i
+    return random.choice(get_friendlies_touching(terr1, aterr))

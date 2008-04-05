@@ -2,7 +2,7 @@ import world
 from world import *
 
 import util
-import rules
+import rules, ai
 
 import gui, wui
 import config
@@ -13,15 +13,7 @@ import time, os, sys
 
 pygame.mixer.init()
 
-SCROLL_ZONE = 5
 SCROLL_SPEED = 12
-
-conf = None # Contains all user configs
-if os.path.exists("settings.py"): # Get user settings if any
-    import settings
-    conf = settings.c
-else: # Or load defaults
-    conf = config.Config()
 
 try:
     import psyco
@@ -29,7 +21,11 @@ try:
 except:
     pass
 
-def make_map_players(world, num_players=2):
+def make_map_players(world, num_players=7, num_ai=6):
+    if num_players < 2:num_players = 2
+    if num_players > 7:num_players = 7
+    if num_ai < 0:num_ai = 0
+    if num_ai > 7:num_ai = 7
     mg = MapGrid(util.make_random_map())
 
     world.grid = mg
@@ -63,10 +59,19 @@ def make_map_players(world, num_players=2):
     ret = []
     for i in players:
         ret.append(Player(i[0], i[1]))
+        for x in i[0]:
+            x.player = ret[-1]
         
 
     world.players = ret
     world.update()
+
+    controllers = []
+    for i in xrange(num_players-num_ai):
+        controllers.append("human")
+    for i in xrange(num_ai):
+        controllers.append(ai.AI("AI-%s"%i, world))
+    return controllers
 
 def game(screen, myConfig):
     screen_size = screen.get_size()
@@ -82,10 +87,11 @@ def game(screen, myConfig):
     whos_turn_label.theme.label["text-color"] = [255,0,0]
     whos_turn_label.make_image()
 
-    fps_label = gui.Label(app, (0, screen_size[1]), "FPS Label", "FPS: ",
-                          widget_pos="bottomleft")
-    fps_label.theme.label["text-color"] = [255,0,0]
-    fps_label.make_image()
+    if myConfig.fps_counter:
+        fps_label = gui.Label(app, (0, screen_size[1]), "FPS Label", "FPS: ",
+                              widget_pos="bottomleft")
+        fps_label.theme.label["text-color"] = [255,0,0]
+        fps_label.make_image()
 
     mg = MapGrid(util.make_random_map())
 
@@ -123,9 +129,9 @@ def game(screen, myConfig):
                                       screen_size[0]-pad_width*2,
                                       world_height-pad_height*2))
     world = World(world_screen, map_grid=mg)
-    make_map_players(world)
+    controllers = make_map_players(world)
 
-    if conf.music:
+    if myConfig.music:
         pygame.mixer.music.load(os.path.join('data','music','slowtheme.ogg'))
         pygame.mixer.music.play(-1)
 
@@ -139,11 +145,14 @@ def game(screen, myConfig):
     zoom_states = [(10, 5), (20, 10), (40, 20), (80, 40)]
     zoom_state = 3
 
+    game_over = False
+
     while 1:
         clock.tick(600)
-        if not pygame.time.get_ticks() % 10:
-            fps_label.text = "FPS: %i" % clock.get_fps()
-            fps_label.make_image()
+        if myConfig.fps_counter:
+            if not pygame.time.get_ticks() % 10:
+                fps_label.text = "FPS: %i" % clock.get_fps()
+                fps_label.make_image()
 
         for event in app.get_events():
             if event.type == QUIT:
@@ -174,8 +183,8 @@ def game(screen, myConfig):
                 if event.button == 1:
                     x = world.get_mouse_terr()
                     if x:
-                        print "clicked player #%ss territory: %s"%(x[0]+1, x[1])
-                        picktwo.append(x)
+                        if controllers[whos_turn] == "human":
+                            picktwo.append(x)
                 if event.button == 4:
                     if zoom_state < 3:
                         zoom_state += 1
@@ -191,19 +200,23 @@ def game(screen, myConfig):
                 if event.widget == gui.Button:
                     if event.name == "End Turn":
                         if event.action == gui.GUI_EVENT_CLICK:
-                            if myConfig.new_unit_dialog:
-                                a = wui.gain_troops(screen, world.players[whos_turn])
-                                if a[1]: #don't do again!
-                                    myConfig.new_unit_dialog = 0
-                                    myConfig.save_settings()
-                            world.players[whos_turn].end_turn()
-                            whos_turn += 1
-                            if whos_turn >= len(world.players):
-                                whos_turn = 0
-                            whos_turn_label.text = "It is player %ss turn"%(whos_turn+1)
-                            whos_turn_label.theme.label["text-color"] = world.players[whos_turn].color
-                            whos_turn_label.make_image()
-                            world.update()
+                            if controllers[whos_turn] == "human":
+                                if myConfig.new_unit_dialog:
+                                    a = wui.gain_troops(screen, world.players[whos_turn])
+                                    if a[1]: #don't do again!
+                                        myConfig.new_unit_dialog = 0
+                                        myConfig.save_settings()
+                                world.players[whos_turn].end_turn()
+                                whos_turn += 1
+                                if whos_turn >= len(world.players):
+                                    whos_turn = 0
+                                whos_turn_label.text = "It is player %ss turn"%(whos_turn+1)
+                                whos_turn_label.theme.label["text-color"] = world.players[whos_turn].color
+                                whos_turn_label.make_image()
+                                for i in picktwo:
+                                    i[1].highlighted = False
+                                picktwo = []
+                                world.update()
 
         if world.players[whos_turn].dead:
             whos_turn += 1
@@ -218,6 +231,7 @@ def game(screen, myConfig):
                           widget_pos="center")
             finish_label.theme.label["text-color"] = world.players[world.one_winner()[1]].color
             finish_label.theme.label["font"] = pygame.font.Font(None, 45)
+            game_over = True
 
         for i in picktwo:
             if not i[1].highlighted: # Don't force a re-render if already highlighted
@@ -256,11 +270,9 @@ def game(screen, myConfig):
                                 if picktwo[1][1].units == 0:
                                     world.players[picktwo[1][0]].territories.remove(picktwo[1][1])
                                     world.players[picktwo[0][0]].territories.append(picktwo[1][1])
+                                    picktwo[1][1].player = world.players[picktwo[0][0]]
 
                                     world.world_image = None #force rerender
-
-                                    if world.players[picktwo[1][0]].territories == []:
-                                        world.players[picktwo[1][0]].dead = True
 
                                     if picktwo[1][1].max_units > picktwo[0][1].units - 1:
                                         picktwo[1][1].units = picktwo[0][1].units - 1
@@ -312,8 +324,63 @@ def game(screen, myConfig):
                 world.update()
             picktwo = []
 
+        if not controllers[whos_turn] == "human":
+            u = controllers[whos_turn]
+
+            msg = u.update(whos_turn) # get messages from ai
+            if msg[0] == "battle":
+                u1, u2 = msg[1], msg[2]
+                x, y = rules.perform_battle(u1, u2)
+                u1.units -= x
+                u2.units -= y
+                
+                if u2.units == 0:
+                    u2.player.territories.remove(u2)
+                    u1.player.territories.append(u2)
+                    u2.player = u1.player
+
+                    world.world_image = None #force rerender
+
+                    if u2.max_units > u1.units - 1:
+                        u2.units = u1.units - 1
+                        u1.units = 1
+                    else:
+                        u2.units = u2.max_units
+                        u1.units -= u2.units
+                u1.update()
+                u2.update()
+            if msg[0] == "move":
+                u1, u2 = msg[1], msg[2]
+                x = u1.units - 1
+                if u2.max_units >= u2.units + x:
+                    pass
+                else:
+                    x = u2.max_units - u2.units
+                u1.units -= x
+                u2.units += x
+                u1.update()
+                u2.update()
+                u1.can_move = False
+            if msg[0] == "end_turn":
+                if not game_over:
+                    controllers[whos_turn].mode = "attack"
+                    world.players[whos_turn].end_turn()
+                    whos_turn += 1
+                    if whos_turn >= len(world.players):
+                        whos_turn = 0
+                    whos_turn_label.text = "It is player %ss turn"%(whos_turn+1)
+                    whos_turn_label.theme.label["text-color"] = world.players[whos_turn].color
+                    whos_turn_label.make_image()
+                    for i in picktwo:
+                        i[1].highlighted = False
+                    picktwo = []
+                    world.update()
+
         screen.fill((0,0,0))
         world.render()
+        for i in world.players:
+            if len(i.territories) == 0:
+                i.dead = True
 
         if pad_up_button.is_clicked():
             world.offset[1] -= SCROLL_SPEED
@@ -324,29 +391,10 @@ def game(screen, myConfig):
         if pad_right_button.is_clicked():
             world.offset[0] += SCROLL_SPEED
 
-##        mpos = pygame.mouse.get_pos()
-##
-##        if mpos[0] <= SCROLL_ZONE or K_LEFT in keys_down:
-##            world.offset[0] -= SCROLL_SPEED
-##        if mpos[0] >= screen_size[0] - SCROLL_ZONE or K_RIGHT in keys_down:
-##            world.offset[0] += SCROLL_SPEED
-##
-##        if mpos[1] <= SCROLL_ZONE or K_UP in keys_down:
-##            world.offset[1] -= SCROLL_SPEED
-##        if (mpos[1] >= world_height - SCROLL_ZONE and not mpos[1] > world_height) \
-##            or K_DOWN in keys_down:
-##            world.offset[1] += SCROLL_SPEED
-##
-##        if not mpos[1] > world_height: # Don't draw rect over the interface area
-##            pos = world.get_mouse_pos()
-##            pygame.draw.rect(screen, (255,255,255),
-##                             (pos[0] * world.tile_size[0] - world.offset[0] + pad_width,
-##                              pos[1] * world.tile_size[1] - world.offset[1] + pad_height,
-##                              world.tile_size[0], world.tile_size[1]),
-##                             1)
-
         app.render()
         pygame.display.flip()
+        if not controllers[whos_turn] == "human":
+            time.sleep(0.1)
 
 def main():
     myConfig = config.Config()
