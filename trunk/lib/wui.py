@@ -7,6 +7,7 @@ import gui, rules
 
 class CheckBox(object):
     def __init__(self, parent, pos, name, widget_pos="topleft"):
+        self.name = name
         self.button = gui.Button(parent, pos, name, "X", widget_pos)
         self.button.over_width = self.button.image.get_width()
         self.button.over_height = self.button.image.get_height()
@@ -16,6 +17,14 @@ class CheckBox(object):
 
     def toggle(self):
         self.state = not self.state
+        if self.state:
+            self.button.text = "X"
+        else:
+            self.button.text = " "
+        self.button.make_image()
+
+    def set_state(self, s):
+        self.state = s
         if self.state:
             self.button.text = "X"
         else:
@@ -53,6 +62,8 @@ def get_username(screen):
 
     while 1:
         for event in app.get_events():
+            if event.type == QUIT:
+                return "QUIT"
             if event.type == gui.GUI_EVENT:
                 if event.widget == gui.TextInputBox:
                     if event.name == "Input1":
@@ -80,6 +91,8 @@ def get_bad_username(screen):
 
     while 1:
         for event in app.get_events():
+            if event.type == QUIT:
+                return "QUIT"
             if event.type == gui.GUI_EVENT:
                 if event.widget == gui.TextInputBox:
                     if event.name == "Input1":
@@ -135,8 +148,7 @@ def do_battle(screen, picktwo, world):
     while 1:
         for event in app.get_events():
             if event.type == QUIT:
-                pygame.quit()
-                return
+                return "QUIT"
             if event.type == gui.GUI_EVENT:
                 if event.name == "MainWindow":
                     event = event.subevent
@@ -193,8 +205,7 @@ def move_troops(screen, picktwo, world):
     while 1:
         for event in app.get_events():
             if event.type == QUIT:
-                pygame.quit()
-                return
+                return "QUIT"
             if event.type == gui.GUI_EVENT:
                 if event.name == "MainWindow":
                     event = event.subevent
@@ -239,8 +250,7 @@ def gain_troops(screen, player):
     while 1:
         for event in app.get_events():
             if event.type == QUIT:
-                pygame.quit()
-                return
+                return "QUIT"
             if event.type == gui.GUI_EVENT:
                 if event.name == "MainWindow":
                     event = event.subevent
@@ -249,5 +259,126 @@ def gain_troops(screen, player):
                         return True, do_again.state
 
         screen.blit(bg, (0,0))
+        screen.blit(app.render(), (0,0))
+        pygame.display.flip()
+
+def Options(screen, myConfig):
+    app = gui.App(pygame.Surface(screen.get_size()))
+    app.theme = gui.make_theme(os.path.join("data", "gui"))
+
+    ol = gui.Label(app, (-1, 0),
+                              "GNL", "Options:",
+                              widget_pos="midtop")
+    ol.theme.font["size"] = 45
+    ol.theme.label["text-color"] = (0, 255, 0)
+    ol.make_image()
+
+    goback = gui.Button(app, screen.get_size(), "GB", "Return",
+                           widget_pos="bottomright")
+    goback.theme.font["size"] = 25
+    goback.theme.button["text-color"] = (125, 255, 125)
+    goback.make_image()
+
+    #make entries...
+    entries = []
+    boxes = []
+    for i in ["fullscreen", "music", "sfx",
+              "fps_counter", "attack_dialog", "move_dialog", "new_unit_dialog"]:
+        if not entries:
+            new = gui.Label(app, (15, 60), i, i,
+                            widget_pos="topleft")
+            entries.append(new)
+            do_again = CheckBox(app, (300, 55), i, "topright")
+            do_again.set_state(getattr(myConfig, i))
+            boxes.append(do_again)
+        else:
+            new = gui.Label(app, (15, entries[-1].rect.bottom+15), i, i,
+                            widget_pos="topleft")
+            entries.append(new)
+            do_again = CheckBox(app, (300, entries[-2].rect.bottom+10), i, "topright")
+            do_again.set_state(getattr(myConfig, i))
+            boxes.append(do_again)
+
+##    for i in ["screen_height", "screen_width", "sound_volume"]:
+##        pass
+
+    screendim = gui.MenuList(app, (screen.get_width(), 60), "ScreenDim",
+                         ["640x480", "800x600", "1024x768"],
+                         widget_pos="topright")
+
+    vlabel = gui.Label(app, (screen.get_width(), screendim.rect.bottom + 15),
+                       "sound_volume", "sound_volume", widget_pos="topright")
+    vbar = gui.ScrollBar(app, vlabel.rect.bottomleft,
+                         "SV_bar", widget_pos="topleft",
+                         tot_size=[10000, 10], view_size=[100, 10],
+                         start_value=0, direction=0)
+    vbar.current_value = myConfig.sound_volume * 0.7
+
+    while 1:
+        for event in app.get_events():
+            if event.type == QUIT:
+                return "QUIT"
+            if event.type == gui.GUI_EVENT:
+                for i in boxes:
+                    i.event(event)
+                if event.name == "GB":
+                    if event.action == gui.GUI_EVENT_CLICK:
+                        #prepare config
+                        for i in boxes:
+                            s = 0
+                            if i.state:
+                                s = 1
+                            setattr(myConfig, i.name, s)
+                        setattr(myConfig, "sound_volume", vbar.current_value * 1.4)
+                        myConfig.save_settings()
+                        return "MainMenu"
+                if event.name == "ScreenDim":
+                    if event.action == gui.GUI_EVENT_CLICK:
+                        a = event.entry.split("x")
+                        myConfig.screen_width = int(a[0])
+                        myConfig.screen_height = int(a[1])
+
+        screen.blit(app.render(), (0,0))
+        pygame.display.flip()
+
+
+def MainMenu(screen):
+    app = gui.App(pygame.Surface(screen.get_size()))
+    app.theme = gui.make_theme(os.path.join("data", "gui"))
+
+    game_name_label = gui.Label(app, (-1, 0),
+                              "GNL", "RoboWars",
+                              widget_pos="midtop")
+    game_name_label.theme.font["size"] = 60
+    game_name_label.theme.label["text-color"] = (0, 255, 0)
+    game_name_label.make_image()
+
+    play_game = gui.Button(app, (-1, -1), "PlaySingle", "Start Single Player Game",
+                           widget_pos="midbottom")
+    play_game.theme.font["size"] = 25
+    play_game.theme.button["text-color"] = (125, 255, 125)
+    play_game.make_image()
+
+    optionsb = gui.Button(app, play_game.rect.midbottom, "OB", "Options",
+                           widget_pos="midtop")
+
+    exit_game = gui.Button(app, optionsb.rect.midbottom, "Exit", "Exit",
+                           widget_pos="midtop")
+
+    while 1:
+        for event in app.get_events():
+            if event.type == QUIT:
+                return "QUIT"
+            if event.type == gui.GUI_EVENT:
+                if event.name == "PlaySingle":
+                    if event.action == gui.GUI_EVENT_CLICK:
+                        return "PlaySingle"
+                if event.name == "OB":
+                    if event.action == gui.GUI_EVENT_CLICK:
+                        return "Options"
+                if event.name == "Exit":
+                    if event.action == gui.GUI_EVENT_CLICK:
+                        return "QUIT"
+
         screen.blit(app.render(), (0,0))
         pygame.display.flip()

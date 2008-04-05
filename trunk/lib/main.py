@@ -167,8 +167,8 @@ def game(screen, myConfig):
 
         for event in app.get_events():
             if event.type == QUIT:
-                pygame.quit()
-                return
+##                pygame.quit()
+                return "QUIT"
             if event.type == KEYDOWN:
                 if event.key == K_s:
                     a = time.localtime()
@@ -214,6 +214,8 @@ def game(screen, myConfig):
                             if controllers[whos_turn] == "human":
                                 if myConfig.new_unit_dialog:
                                     a = wui.gain_troops(screen, world.players[whos_turn])
+                                    if a == "QUIT":
+                                        return "QUIT"
                                     if a[1]: #don't do again!
                                         myConfig.new_unit_dialog = 0
                                         myConfig.save_settings()
@@ -272,6 +274,8 @@ def game(screen, myConfig):
                         if picktwo[0][1].can_move:
                             if myConfig.attack_dialog:
                                 a = wui.do_battle(screen, picktwo, world)
+                                if a == "QUIT":
+                                    return "QUIT"
                                 if a[1]: #don't do again!
                                     myConfig.attack_dialog = 0
                                     myConfig.save_settings()
@@ -309,6 +313,8 @@ def game(screen, myConfig):
                         if picktwo[0][1].can_move:
                             if myConfig.move_dialog:
                                 a = wui.move_troops(screen, picktwo, world)
+                                if a == "QUIT":
+                                    return "QUIT"
                                 if a[1]: #don't do again!
                                     myConfig.move_dialog = 0
                                     myConfig.save_settings()
@@ -421,13 +427,45 @@ def game(screen, myConfig):
         if not controllers[whos_turn] == "human":
             time.sleep(0.1)
 
+def do_settings(myConfig):
+    pygame.mixer.music.set_volume(myConfig.sound_volume*0.01)
+    screen_size = (myConfig.screen_width, myConfig.screen_height)
+    if myConfig.fullscreen:
+        screen = pygame.display.set_mode(screen_size, FULLSCREEN)
+    else:
+        screen = pygame.display.set_mode(screen_size)
+    return screen
+
 def main():
     myConfig = config.Config()
     pygame.init()
-    pygame.mixer.music.set_volume(myConfig.sound_volume*0.01)
-    screen_size = (myConfig.screen_width, myConfig.screen_height)
-    screen = pygame.display.set_mode(screen_size)
+    screen = do_settings(myConfig)
 
-    uname = wui.get_username(screen)
+##    uname = wui.get_username(screen)
 
-    game(screen, myConfig)
+##    game(screen, myConfig)
+
+    goto = "MainMenu"
+    while 1:
+        if goto == "MainMenu":
+            a = wui.MainMenu(screen)
+            if a == "QUIT":
+                pygame.quit()
+                return
+            if a == "PlaySingle":
+                goto = "Game"
+            if a == "Options":
+                goto = a
+        if goto == "Game":
+            a = game(screen, myConfig)
+            if a == "QUIT":
+                pygame.quit()
+                return
+            goto = "MainMenu"
+        if goto == "Options":
+            a = wui.Options(screen, myConfig)
+            if a == "QUIT":
+                pygame.quit()
+                return
+            goto = "MainMenu"
+            screen = do_settings(myConfig)
