@@ -11,8 +11,6 @@ import random
 
 import time, os, sys
 
-pygame.mixer.init()
-
 SCROLL_SPEED = 12
 
 try:
@@ -423,12 +421,24 @@ def game(screen, myConfig, nump, numai):
             time.sleep(0.1)
 
 def do_settings(myConfig):
-    pygame.mixer.music.set_volume(myConfig.sound_volume*0.01)
     screen_size = (myConfig.screen_width, myConfig.screen_height)
     if myConfig.fullscreen:
         screen = pygame.display.set_mode(screen_size, FULLSCREEN)
     else:
         screen = pygame.display.set_mode(screen_size)
+    if myConfig.music:
+        try:
+            pygame.mixer.init()
+        except:
+            pass
+        pygame.mixer.music.load(os.path.join('data','music','fasttheme.ogg'))
+        pygame.mixer.music.play(-1)
+        pygame.mixer.music.set_volume(myConfig.sound_volume*0.01)
+    else:
+        try:
+            pygame.mixer.quit()
+        except:
+            pass
     return screen
 
 def main():
