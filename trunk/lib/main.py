@@ -10,6 +10,8 @@ import random
 
 import time, os, sys
 
+import client
+
 pygame.mixer.init()
 
 SCROLL_ZONE = 5
@@ -30,30 +32,7 @@ def make_map_players(world, num_players=2):
     players = []
     pterr = list(mg.comp_terrs)
     random.shuffle(pterr)
-##    p = Player(mg.comp_terrs[0], (255, 0, 0))
-##    p.territories = mg.comp_terrs
-##    for i in xrange(7):
-##        new = Player
-##    new = Player(mg.comp_terrs[0], mg.comp_terrs[0:4], (255, 0, 0))
-##    players.append(new)
-##
-##    new = Player(mg.comp_terrs[4], mg.comp_terrs[4:8], (0, 255, 0))
-##    players.append(new)
-##
-##    new = Player(mg.comp_terrs[8], mg.comp_terrs[8:12], (0, 0, 255))
-##    players.append(new)
-##
-##    new = Player(mg.comp_terrs[12], mg.comp_terrs[12:16], (255, 255, 0))
-##    players.append(new)
-##
-##    new = Player(mg.comp_terrs[16], mg.comp_terrs[16:20], (255, 0, 255))
-##    players.append(new)
-##
-##    new = Player(mg.comp_terrs[20], mg.comp_terrs[20:24], (0, 255, 255))
-##    players.append(new)
-##
-##    new = Player(mg.comp_terrs[24], mg.comp_terrs[24:28], (255, 125, 125))
-##    players.append(new)
+
     colors = [(255, 0, 0),
               (0, 255, 0),
               (0, 0, 255),
@@ -64,8 +43,6 @@ def make_map_players(world, num_players=2):
     for i in xrange(num_players):
         new = random.choice(pterr)
         pterr.remove(new)
-##        p = Player(new, [], colors[i])
-##        players.append(p)
         players.append([new, [new], colors[i]])
 
     
@@ -90,10 +67,8 @@ def make_map_players(world, num_players=2):
 ##if sys.platform == "linux2":
 ##    pygame.mixer.pre_init(44100, -16, 2, 2048)
 
-def main():
-    pygame.init()
-    screen_size = (640, 480)
-    screen = pygame.display.set_mode(screen_size)
+def game(screen):
+    screen_size = screen.get_size()
     world_height = round(screen_size[1]*0.666) # World uses 2/3 of the screen
     world_screen = screen.subsurface((0, 0, screen_size[0], world_height))
 
@@ -297,3 +272,12 @@ def main():
 
         app.render()
         pygame.display.flip()
+
+def main():
+    pygame.init()
+    screen_size = (640, 480)
+    screen = pygame.display.set_mode(screen_size)
+
+    uname = wui.get_username(screen)
+
+    game(screen)
