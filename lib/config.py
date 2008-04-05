@@ -15,7 +15,7 @@ class Config(object):
 
     def make_file(self):
         """makes a new config file if there isn't one yet."""
-        fname = os.path.join("data", "config.py")
+        fname = os.path.join("data", "config.txt")
         if not os.path.exists(fname):
             self.save_settings()
 
