@@ -10,8 +10,10 @@ def get_username(screen):
     app.theme = gui.make_theme(os.path.join("data", "gui"))
 
     inp = gui.TextInputBox(app, (-1, -1), "Input1",
-                           "input", "testy",
+                           "username", "testy",
                            widget_pos="center")
+    inp.focused = True
+    inp.make_text()
 
     while 1:
         for event in app.get_events():
@@ -20,6 +22,9 @@ def get_username(screen):
                     if event.name == "Input1":
                         if event.action == gui.GUI_EVENT_INPUT:
                             return event.string
+            if event.type == QUIT:
+                pygame.quit()
+                return
 
         screen.blit(app.render(), (0,0))
         pygame.display.flip()
@@ -32,8 +37,10 @@ def get_bad_username(screen):
                   widget_pos="midbottom")
 
     inp = gui.TextInputBox(app, (-1, -1), "Input1",
-                           "input", "pick new username",
+                           "username", "pick new username",
                            widget_pos="midtop")
+    inp.focused = True
+    inp.make_text()
 
     while 1:
         for event in app.get_events():
@@ -42,6 +49,9 @@ def get_bad_username(screen):
                     if event.name == "Input1":
                         if event.action == gui.GUI_EVENT_INPUT:
                             return event.string
+            if event.type == QUIT:
+                pygame.quit()
+                return
 
         screen.blit(app.render(), (0,0))
         pygame.display.flip()
