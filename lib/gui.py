@@ -1248,8 +1248,12 @@ class ScrollBar(Widget):
         render_area = big_bar.subsurface(bsize, area)
         old_render_area = render_area.copy()
 
+        area = [float(area[0]), float(area[1])]
+
         bar_size = ((area[0] / (self.tot_size[0] / area[0]) - bsize[0] * 2),
                     (area[1] / (self.tot_size[1] / area[1]) - bsize[1] * 2))
+
+        bar_size = [int(bar_size[0]), int(bar_size[1])]
 
         if self.direction == 0:
             w = self.theme.scroll_bar["default"].get_width()
