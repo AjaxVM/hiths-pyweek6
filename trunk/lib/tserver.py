@@ -8,6 +8,8 @@ class GameServer(pb.Root):
         self.game_type = game_type
         self.players = []
 
+        self._last_send_index = 0
+
     def remove_user(self, user):
         self.players.remove(user)
         if user.alive:
@@ -15,19 +17,23 @@ class GameServer(pb.Root):
             # TODO replace with AI
             #print "Replaced %s with AI player" % user.name
             pass
+        # Send updated player list?
 
     def send_to_all(self, func, *data):
         """Executes the passed function for all clients"""
         try:
-            for i in self.players:
+            for i in self.players[self._last_send_index:]:
                 d = i.client.callRemote(func, *data)
                 d.addErrback(self.error)
                 print "Sending to: " + i.name
         except pb.DeadReferenceError:
             print "Dropping dead reference to " + i.name
-            self.remove_user(i)
             # TODO more efficient way of finishing list?
+            self._last_send_index = self.players.index(i)
+            self.remove_user(i)
             self.send_to_all(func, *data)
+        else:
+            self._last_send_index = 0
 
     def remote_join(self, client, name):
         # Check for an empty slot
@@ -39,6 +45,22 @@ class GameServer(pb.Root):
         self.players.append(CopyUser(client, name))
         # Resend the updated player list..
         self.send_to_all("send_players", self.players)
+
+    def remote_leave(self, client):
+        user = self.find_user(client)
+        if user:
+            self.remove_user(user)
+        print user.name, "left the game"
+
+    def remote_get_chat_msg(self, client, msg):
+        user = self.find_user(client)
+        print "=", user.name, msg
+        self.send_to_all("send_chat_msg", user.name, msg)
+
+    def find_user(self, remote_ref):
+        for i in self.players:
+            if i.client == remote_ref:
+                return i
 
     def error(self, msg):
         print msg
