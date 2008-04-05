@@ -256,6 +256,8 @@ class Button(Widget):
 
         self.make_image()
 
+        self.visible = True
+
         self.__mouse_hold_me = False
 
     def not_active(self):
@@ -345,7 +347,8 @@ class Button(Widget):
         return None
 
     def render(self, surface):
-        surface.blit(self.image, self.rect.topleft)
+        if self.visible:
+            surface.blit(self.image, self.rect.topleft)
         return None
 
     def change_image(self, new):
@@ -355,30 +358,32 @@ class Button(Widget):
         return None
 
     def event(self, event):
-        mpos = self.get_mouse_pos()
-        if mpos and self.rect.collidepoint(mpos):
-            if self.__mouse_hold_me:
-                self.change_image(self.click)
-            else:
-                self.change_image(self.hover)
-        else:
-            self.change_image(self.regular)
-
-        if event.type == MOUSEBUTTONDOWN:
+        if self.visible:
+            mpos = self.get_mouse_pos()
             if mpos and self.rect.collidepoint(mpos):
-                self.change_image(self.click)
-                self.__mouse_hold_me = True
-                self.parent.move_to_top(self)
-                return None
-            return event
-        if event.type == MOUSEBUTTONUP:
-            if self.__mouse_hold_me:
-                self.__mouse_hold_me = False
+                if self.__mouse_hold_me:
+                    self.change_image(self.click)
+                else:
+                    self.change_image(self.hover)
+            else:
+                self.change_image(self.regular)
+
+            if event.type == MOUSEBUTTONDOWN:
                 if mpos and self.rect.collidepoint(mpos):
-                    self.change_image(self.regular)
+                    self.change_image(self.click)
+                    self.__mouse_hold_me = True
                     self.parent.move_to_top(self)
-                    return Event(Button, self.name, GUI_EVENT_CLICK)
-                return None
+                    return None
+                return event
+            if event.type == MOUSEBUTTONUP:
+                if self.__mouse_hold_me:
+                    self.__mouse_hold_me = False
+                    if mpos and self.rect.collidepoint(mpos):
+                        self.change_image(self.regular)
+                        self.parent.move_to_top(self)
+                        return Event(Button, self.name, GUI_EVENT_CLICK)
+                    return None
+                return event
             return event
         return event
 
